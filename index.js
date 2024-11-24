@@ -10,7 +10,7 @@ import env from "dotenv";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const saltRounds = process.env.SALT_ROUNDS;
+const saltRounds = 10;
 env.config();
 
 // Създаване на масив с имена на профилни снимки
