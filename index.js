@@ -2,9 +2,11 @@ import express from "express";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import pg from "pg";
+import env from "dotenv";
 
 const app = express();
 const port = process.env.PORT || 3000;
+env.config();
 
 // Connecting to PostgreSQL server
 const db = new pg.Client({
