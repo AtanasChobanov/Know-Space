@@ -1,145 +1,79 @@
 <%- include("partials/header.ejs") %>
 
-<div id="search-form">
-    <input type="text" id="search-input" placeholder="Search posts">
-    <button type="submit">Search</button>
-</div>
+<div class="container">
+    <% if (channel) { %>
+        <div class="channel-name">
+            <h1><%= channel.name %></h1>
+        </div>
+        <div class="button-container">
+            <!-- Link to create a new post -->
+            <a href="/<%= channel.channel_id %>/new-post" class="button">Създай нов пост</a>
 
-<div id="post-list">
-    <!-- Добави линк към страницата за създаване на нов пост в канала -->
-    <a href="/<%= channel_id %>/new-post" class="btn btn-primary mb-3">Създай нов пост</a>
-    
-    <!-- Проверяваме дали има постове -->
-    <% if (posts && posts.length > 0) { %>
-        <% posts.forEach((post) => { %>
-            <div class="post mb-4" data-title="<%= post.title %>">
-                <h2 class="pb-2"><%= post.title %></h2>
-                <p><%= post.content %></p>
-                <p><%= post.author %></p>
-                <% if (post.date_of_last_edit) { %>
-                    <small>Редактиран на: <%= post.date_of_last_edit %></small>
-                <% } else { %>
-                    <small>Създаден на: <%= post.date_of_creation %></small>
-                <% } %>
-                <!-- Линкове за редактиране и изтриване на пост -->
-                <a href="/<%= channel_id %>/edit/<%= post.post_id %>" class="btn btn-warning btn-sm">Редактиране</a>
-                <a href="/<%= channel_id %>/delete-post/<%= post.post_id %>" class="btn btn-danger btn-sm">Изтриване</a>
-                
-                <!-- Добави методите за JavaScript -->
-                <button class="btn btn-primary" onclick="toggleReplyForm(this)">Отговори</button>
-                <div class="reply-form hidden">
-                    <textarea class="form-control" rows="2" placeholder="Write your reply here..."></textarea>
-                    <button class="btn btn-success mt-2" onclick="submitReply(this)">Публикувай отговора</button>
+            <!-- Search form for posts -->
+            <form action="/search-post" method="POST">
+                <div class="searchBox">
+                    <input class="searchInput" 
+                           type="text" 
+                           name="searchedItem" 
+                           placeholder="Търсене на публикация..."
+                           required autocomplete="off">
+                    <button class="searchIconButton" type="submit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="29" height="29" viewBox="0 0 29 29" fill="none">
+                            <g clip-path="url(#clip0_2_17)">
+                                <g filter="url(#filter0_d_2_17)">
+                                    <path d="M23.7953 23.9182L19.0585 19.1814M19.0585 19.1814C19.8188 18.4211 20.4219 17.5185 20.8333 16.5251C21.2448 15.5318 21.4566 14.4671 21.4566 13.3919C21.4566 12.3167 21.2448 11.252 20.8333 10.2587C20.4219 9.2653 19.8188 8.36271 19.0585 7.60242C18.2982 6.84214 17.3956 6.23905 16.4022 5.82759C15.4089 5.41612 14.3442 5.20435 13.269 5.20435C12.1938 5.20435 11.1291 5.41612 10.1358 5.82759C9.1424 6.23905 8.23981 6.84214 7.47953 7.60242C5.94407 9.13789 5.08145 11.2204 5.08145 13.3919C5.08145 15.5634 5.94407 17.6459 7.47953 19.1814C9.01499 20.7168 11.0975 21.5794 13.269 21.5794C15.4405 21.5794 17.523 20.7168 19.0585 19.1814Z" 
+                                          stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" shape-rendering="crispEdges">
+                                    </path>
+                                </g>
+                            </g>
+                            <defs>
+                                <filter id="filter0_d_2_17" x="-0.418549" y="3.70435" width="29.7139" height="29.7139" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                                    <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                                    <feOffset dy="4"></feOffset>
+                                    <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+                                    <feComposite in2="hardAlpha" operator="out"></feComposite>
+                                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_17"></feBlend>
+                                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_17" result="shape"></feBlend>
+                                </filter>
+                                <clipPath id="clip0_2_17">
+                                    <rect width="28.0702" height="28.0702" fill="white" transform="translate(0.403503 0.526367)"></rect>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </button>
                 </div>
-                <div class="replies"></div>
-            </div>
-        <% }); %>
+            </form>
+        </div>
+        <% if (posts && posts.length > 0) { %>
+            <% posts.forEach((post) => { %>
+                <div class="channel-card mb-4 text-center" data-title="<%= post.title %>">
+                    <h2 class="pb-2 text-center"><%= post.title %></h2>
+                    <p class="text-center"><%= post.content %></p>
+                    <p class="text-center"><%= post.author %></p>
+
+                    <% if (post.date_of_last_edit) { %>
+                        <small class="text-center">Редактиран на: <%= post.date_of_last_edit %></small>
+                    <% } else { %>
+                        <small class="text-center">Създаден на: <%= post.date_of_creation %></small>
+                    <% } %>
+                    
+                    <% if(user.user_id === post.author_id) { %>
+                    <a href="/<%= channel.channel_id %>/edit/<%= post.post_id %>" class="button edit-button">Редактиране</a>
+                    <a href="/<%= channel.channel_id %>/delete-post/<%= post.post_id %>" class="button delete-button">Изтриване</a>
+                    <% } %>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>Няма постове в този канал.</p>
+        <% } %>%>
     <% } else { %>
-        <p>Няма постове в този канал.</p>
-    <% } %>
+        <p>Този канал не съществува.</p>
+    <% } %>%>
 </div>
-
-<div id="new-post-form" style="display: none;">
-    <input type="text" id="post-title" placeholder="Post Title">
-    <textarea id="post-content" placeholder="Post Content"></textarea>
-    <button onclick="createPost()">Създаване на пост</button>
-</div>
-
-<script>
-    function toggleReplyForm(button) {
-        const replyForm = button.nextElementSibling;
-        replyForm.classList.toggle('hidden');
-    }
-
-    function submitReply(button) {
-        const replyText = button.previousElementSibling.value;
-        const repliesDiv = button.parentElement.nextElementSibling;
-
-        if (replyText.trim()) {
-            const replyDiv = document.createElement('div');
-            replyDiv.classList.add('reply');
-            replyDiv.innerHTML = `
-                <p>${replyText}</p>
-                <span class="thumbs" onclick="markHelpful(this, true)">👍</span>
-                <span class="thumbs" onclick="markHelpful(this, false)">👎</span>
-                <span class="helpful-count">Helpful: 0</span>
-                <span class="not-helpful-count">Not Helpful: 0</span>
-            `;
-            repliesDiv.appendChild(replyDiv);
-            button.parentElement.classList.add('hidden');
-            button.previousElementSibling.value = '';
-        } else {
-            alert('Reply cannot be empty.');
-        }
-    }
-
-    function markHelpful(thumb, isHelpful) {
-        const replyDiv = thumb.parentElement;
-        const thumbs = replyDiv.querySelectorAll('.thumbs');
-        const helpfulCountSpan = replyDiv.querySelector('.helpful-count');
-        const notHelpfulCountSpan = replyDiv.querySelector('.not-helpful-count');
-
-        if (thumb.classList.contains('disabled')) return;
-
-        if (isHelpful) {
-            let currentHelpfulCount = parseInt(helpfulCountSpan.textContent.split(': ')[1]);
-            helpfulCountSpan.textContent = `Helpful: ${currentHelpfulCount + 1}`;
-        } else {
-            let currentNotHelpfulCount = parseInt(notHelpfulCountSpan.textContent.split(': ')[1]);
-            notHelpfulCountSpan.textContent = `Not Helpful: ${currentNotHelpfulCount + 1}`;
-        }
-
-        thumbs.forEach(t => t.classList.add('disabled'));
-    }
-
-    function toggleNewPostForm() {
-        const newPostForm = document.getElementById('new-post-form');
-        newPostForm.style.display = newPostForm.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function createPost() {
-        const title = document.getElementById('post-title').value;
-        const content = document.getElementById('post-content').value;
-        const postList = document.getElementById('post-list');
-
-        if (title && content) {
-            const postDiv = document.createElement('div');
-            postDiv.classList.add('post');
-            postDiv.setAttribute('data-title', title);
-            postDiv.innerHTML = `
-                <h2>${title}</h2>
-                <p>${content}</p>
-                <button onclick="toggleReplyForm(this)">Reply</button>
-                <div class="reply-form hidden">
-                    <textarea placeholder="Write your reply"></textarea>
-                    <button onclick="submitReply(this)">Submit Reply</button>
-                </div>
-                <div class="replies"></div>
-            `;
-            postList.appendChild(postDiv);
-            document.getElementById('new-post-form').style.display = 'none'; // Hide form
-            document.getElementById('post-title').value = '';
-            document.getElementById('post-content').value = '';
-        } else {
-            alert('Please fill out both fields.');
-        }
-    }
-
-    function searchPosts(event) {
-        event.preventDefault();
-        const searchText = document.getElementById('search-input').value.toLowerCase();
-        const posts = document.querySelectorAll('#post-list .post');
-        posts.forEach(post => {
-            const postTitle = post.getAttribute('data-title').toLowerCase();
-            if (postTitle.includes(searchText)) {
-                post.style.display = '';
-            } else {
-                post.style.display = 'none';
-            }
-        });
-    }
-
-    document.getElementById('search-form').addEventListener('submit', searchPosts);
-</script>
 
 <%- include("partials/footer.ejs") %>
+
+
+

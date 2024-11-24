@@ -1,11 +1,11 @@
 <%- include("partials/header.ejs") %>
 
-<div class="form-container">
+<div class="container">
     <h1>Изтриване на канал</h1>
     <p>Сигурни ли сте, че искате да изтриете този канал: <%= channel.name %>?</p>
     <form action="/<%= channel.channel_id %>/delete?_method=DELETE" method="POST">
-        <button type="submit" class="btn btn-danger">Изтрий канала</button>
-        <a href="/" class="btn btn-secondary">Назад</a>
+        <button type="submit" class="button delete-button">Изтрий канала</button>
+        <a href="/" class="button">Назад</a>
     </form>
 </div>
 

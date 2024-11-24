@@ -5,7 +5,7 @@
     <form action="/<%= channel_id %>/edit-post/<%= post.post_id %>?_method=PATCH" method="POST">
         <input name="title" class="form-control mb-2" type="text" value="<%= post.title %>" required>
         <textarea name="content" class="form-control mb-2" rows="4" required><%= post.content %></textarea>
-        <button class="btn btn-primary" type="submit">Обновяване на поста</button>
+        <button class="button" type="submit">Обновяване на поста</button>
     </form>
 </div>
 

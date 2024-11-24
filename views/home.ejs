@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KnowSpace</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .left, .right {
+      width: 25%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+
+    .left img, .right img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .center {
+      width: 50%;
+      background-color: #007bff;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .center h1 {
+      font-size: 2.5em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .center p {
+      font-size: 1.2em;
+      line-height: 1.6;
+      margin-bottom: 30px;
+    }
+
+    .button-container {
+      display: flex;
+      gap: 20px;
+    }
+
+    .register-button, .login-button {
+      display: inline-block;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      color: white;
+      text-decoration: none;
+      background-color: transparent;
+      border: 2px solid white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .register-button:hover, .login-button:hover {
+      background-color: white;
+      color: #007bff;
+    }
+
+    .register-button:active, .login-button:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <img src="/images/KnowSpaceHeader.png" alt="Image Left">
+    </div>
+
+    <div class="center">
+      <h1>KnowSpace</h1>
+      <p style="margin-bottom: 60px;">
+        Проектът „KnowSpace” си е поставил за цел да създаде виртуална среда, в която хората обменят и обогатяват знанията и уменията си. Използването на такава социална мрежа от ученици, учители и обикновени потребители и др. реализира следните цели:
+      </p>
+      <p style="margin-bottom: 60px;">
+        • Стимулиране на успеха на учениците чрез интерактивен и познат начин на комуникация <br>
+        • Социална мрежа, която се отличава от останалите такива като цели потребителите да се учат взаимно
+      </p>
+      <div class="button-container">
+        <a href="/register" class="register-button">Създай профил</a>
+        <a href="/login" class="login-button">Влез в профил</a>
+      </div>
+    </div>
+
+    <div class="right">
+      <img src="/images/image-right.png" alt="Image Right">
+    </div>
+  </div>
+</body>
+</html>

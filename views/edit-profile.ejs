@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактиране на профил</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 25px 35px;
+            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 30px 30px -20px;
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        .heading {
+            font-size: 30px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .input {
+            width: 90%;
+            background: #fff;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 20px;
+            margin-top: 15px;
+            box-shadow: #cff0ff 0px 10px 10px -5px;
+            border: 2px solid transparent;
+        }
+
+        .input::placeholder {
+            color: #aaa;
+        }
+
+        .input:focus {
+            outline: none;
+            border: 2px solid #007bff;
+        }
+
+        .submit-button {
+            display: block;
+            width: 90%;
+            background: linear-gradient(45deg, #007bff 0%, #007bff 100%);
+            color: white;
+            padding-block: 15px;
+            margin: 20px auto;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .submit-button:hover {
+            transform: scale(1.03);
+            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 23px 10px -20px;
+        }
+
+        .submit-button:active {
+            transform: scale(0.95);
+            box-shadow: rgba(133, 189, 215, 0.8784313725) 0px 15px 10px -10px;
+        }
+
+        .toggle-link {
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .toggle-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            width: 300px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .popup .input {
+            margin-bottom: 15px;
+        }
+
+        .popup button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+
+        .popup .close {
+            color: #007bff;
+            font-size: 18px;
+            cursor: pointer;
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="heading">Редактиране на профил</h2>
+        <form class="form" method="POST" action="/edit-profile">
+            <input type="text" class="input" name="username" placeholder="Име..." value="<%= user.username %>" required>
+            <textarea class="input" name="bio" placeholder="Въведете описание..." maxlength="100"><%= user.bio %></textarea>
+            <button type="submit" class="submit-button">Запази</button>
+        </form>
+
+        <button type="button" class="submit-button" onclick="openPopup()">Смяна на парола</button>
+    </div>
+
+    <div id="passwordPopup" class="popup">
+        <div class="popup-content">
+            <h3>Смяна на парола</h3>
+            <form method="POST" action="/change-password">
+                <input type="password" class="input" name="oldPassword" placeholder="Стара парола">
+                <input type="password" class="input" name="newPassword" placeholder="Нова парола">
+                <input type="password" class="input" name="confirmPassword" placeholder="Потвърдете новата парола">
+                <button type="submit">Промени парола</button>
+            </form>
+            <span class="close" onclick="closePopup()">Затвори</span>
+        </div>
+    </div>
+
+    <script>
+        function openPopup() {
+            document.getElementById('passwordPopup').style.display = 'flex';
+        }
+
+        function closePopup() {
+            document.getElementById('passwordPopup').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
