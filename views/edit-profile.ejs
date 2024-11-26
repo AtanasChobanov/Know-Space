@@ -144,6 +144,12 @@
             margin-top: 10px;
             text-align: center;
         }
+
+        textarea {
+            resize: vertical; 
+            max-height: 200px;
+            font-family: Arial, sans-serif;
+        }
     </style>
 </head>
 <body>
@@ -151,7 +157,7 @@
         <h2 class="heading">Редактиране на профил</h2>
         <form class="form" method="POST" action="/edit-profile">
             <input type="text" class="input" name="username" placeholder="Име..." value="<%= user.username %>" required>
-            <textarea class="input" name="bio" placeholder="Въведете описание..." maxlength="100"><%= user.bio %></textarea>
+            <textarea class="input" name="bio" placeholder="Въведете описание..." maxlength="60"><%= user.bio %></textarea>
             <button type="submit" class="submit-button">Запази</button>
         </form>
 

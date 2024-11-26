@@ -37,8 +37,9 @@
     <% if (channels && channels.length > 0) { %>
         <% channels.forEach((channel) => { %>
             <div class="channel-card mb-4 text-center">
+                <a href="/account/<%= channel.admin_id %>" class="profile-link"><img src="/uploads/profile-pictures/<%= channel.admin_picture %>" alt="Profile" class="profile"></a>
                 <h2 class="pb-2"><%= channel.name %></h2>
-                <p><%= channel.admin %></p>
+                <p>Администратор: <a href="/account/<%= channel.admin_id %>"><%= channel.admin %></a></p>
                 <p>Създадено на: <%= channel.date_of_creation %></p>
     
                 <% if (!channel.is_member) { %>

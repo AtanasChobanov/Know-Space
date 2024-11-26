@@ -35,6 +35,7 @@
             <div class="channel-grid">
                 <% channels.forEach(function(channel) { %>
                     <div class="channel-card">
+                        <a href="/account/<%= channel.admin_id %>" class="profile-link"><img src="/uploads/profile-pictures/<%= channel.admin_picture %>" alt="Profile" class="profile"></a>
                         <h2 class="channel-name">
                             <a href="/view/<%= channel.channel_id %>"><%= channel.name %></a>
                         </h2>

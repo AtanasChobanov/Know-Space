@@ -51,7 +51,7 @@
                 <div class="channel-card mb-4 text-center" data-title="<%= post.title %>">
                     <h2 class="pb-2 text-center"><%= post.title %></h2>
                     <p class="text-center"><%= post.content %></p>
-                    <p class="text-center"><%= post.author %></p>
+                    <p class="text-center">Автор: <a href="/account/<%= post.author_id %>"><%= post.author %></a></p>
 
                     <% if (post.date_of_last_edit) { %>
                         <small class="text-center">Редактиран на: <%= post.date_of_last_edit %></small>

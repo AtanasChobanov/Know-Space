@@ -462,7 +462,6 @@ button:active {
     padding: 20px;
   }
 
-  /* Стил за картата */
   .card-container {
     margin-left: 80px;
     margin-top: 70px;
@@ -481,10 +480,11 @@ button:active {
     border: 2px solid rgba(var(--cardBase), 1);
     box-shadow: 0 0 5em rgba(var(--cardBase), .25);
     border-radius: 10px;
-    background: rgba(var(--cardbg), 1);
     position: relative;
-    width: 320px;
-    max-height: 400px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    width: auto;
+    max-height: auto;
     perspective: 1000px;
     z-index: 0;
     transition: all 1s ease-out;
@@ -503,7 +503,9 @@ button:active {
     padding: 1em;
     margin: 0 1em;
     color: rgba(var(--cardText), 1);
-    background-color: rgba(250, 246, 246, 1);
+    max-height: auto;
+    text-align: center;
+      
   }
 
   .card-info span {
@@ -536,6 +538,8 @@ button:active {
     color: rgba(var(--cardText), 0.75);
     text-align: center;
     margin-bottom: 20px;
+    word-wrap: break-word;
+    line-height: 1.5;
   }
 
   .card-info .btn {
@@ -554,12 +558,12 @@ button:active {
     background-color: rgba(var(--cardsquares), .85);
   }
 
-  /* Постове */
   .posts-container {
-    margin-left: 30px; /* Малък margin отляво */
+    margin-left: 80px;
     margin-top: 20px;
     flex-grow: 1;
-  }
+    }
+
 
   .posts-container h3 {
     font-size: 1.8em;
@@ -575,7 +579,7 @@ button:active {
   .posts-container li {
     background: #fff;
     padding: 20px;
-    margin: 15px 0;
+    margin: 80px 0;
     border-radius: 8px;
     box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
   }

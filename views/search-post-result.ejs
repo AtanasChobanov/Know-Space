@@ -37,7 +37,7 @@
         <% posts.forEach((post) => { %>
             <div class="channel-card mb-4 text-center">
                 <h2 class="pb-2"><%= post.title %></h2>
-                <p><%= post.author %></p>
+                <p class="text-center">Автор: <a href="/account/<%= post.author_id %>"><%= post.author %></a></p>
 
                 <% if (post.date_of_last_edit) { %>
                     <small>Редактиран на: <%= post.date_of_last_edit %></small>

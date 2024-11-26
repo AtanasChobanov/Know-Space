@@ -40,8 +40,8 @@
       align-items: center;
     }
 
-    .input {
-      width: 90%;
+    .input, select {
+      width: 100%;
       background: #fff;
       border: none;
       padding: 15px 20px;
@@ -50,19 +50,31 @@
       box-shadow: #cff0ff 0px 10px 10px -5px;
       border: 2px solid transparent;
     }
+     .menu {
+      width: 100%;
+      background: #fff;
+      border: none;
+      padding: 15px 20px;
+      border-radius: 20px;
+      margin-top: 15px;
+      box-shadow: #cff0ff 0px 10px 10px -5px;
+      border: 2px solid transparent;
+    }
+   
+   
 
     .input::placeholder {
       color: #aaa;
     }
 
-    .input:focus {
+    .input:focus, select:focus {
       outline: none;
       border: 2px solid #007bff;
     }
 
     .submit-button {
       display: block;
-      width: 90%;
+      width: 100%; /* Увеличих ширината на бутона до 100% */
       background: linear-gradient(45deg, #007bff 0%, #007bff 100%);
       color: white;
       padding-block: 15px;
@@ -92,22 +104,6 @@
       color: #007bff;
       text-decoration: none;
     }
-
-    select {
-      width: 90%;
-      padding: 15px 20px;
-      background: #fff;
-      border-radius: 20px;
-      margin-top: 15px;
-      border: 2px solid transparent;
-      box-shadow: #cff0ff 0px 10px 10px -5px;
-      color: #555;
-    }
-
-    select:focus {
-      outline: none;
-      border: 2px solid #007bff;
-    }
   </style>
 </head>
 <body>
@@ -117,9 +113,9 @@
       <input type="text" class="input" name="username" placeholder="Име" required>
       <input type="email" class="input" name="email" placeholder="Имейл" required>
       <input type="password" class="input" name="password" placeholder="Парола" required>
-      
-      <select name="type" id="user-role" class="input" required>
-        <option value="" disabled selected>Избери категория</option>
+
+      <select name="type" id="user-role" class="menu" required>
+        <option  value="" disabled selected>Избери категория</option>
         <option value="Ученик">Ученик</option>
         <option value="Учител">Учител</option>
         <option value="Друг">Друг</option>

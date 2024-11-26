@@ -10,7 +10,7 @@ import env from "dotenv";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const saltRounds = process.env.SALT_ROUNDS;
+const saltRounds = 10;
 env.config();
 
 // Създаване на масив с имена на профилни снимки
@@ -63,7 +63,7 @@ db.connect();
 // READING channels to display
 async function readChannels(user_id) {
   const query = `
-    SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, COUNT(moc.user_id) AS members_count
+    SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
     FROM channels ch
     JOIN users u ON ch.admin_id = u.user_id
     LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
@@ -72,7 +72,7 @@ async function readChannels(user_id) {
       FROM members_of_channels 
       WHERE user_id = $1
     )
-    GROUP BY ch.channel_id, u.username
+    GROUP BY ch.channel_id, u.username, u.profile_picture
     ORDER BY ch.date_of_creation DESC;
   `;
 
@@ -137,7 +137,7 @@ async function findPost(post_id) {
 // READING search result to display channels
 async function searchChannels(searchedItem) {
   const result = await db.query(
-    "SELECT channel_id, ch.name, date_of_creation, admin_id, " +
+    "SELECT channel_id, ch.name, date_of_creation, admin_id, u.profile_picture AS admin_picture, " +
       "u.username AS admin FROM channels ch " +
       "JOIN users u " +
       "ON ch.admin_id = u.user_id WHERE LOWER(ch.name) LIKE '%' || $1 || '%';",
@@ -290,23 +290,133 @@ app.post("/edit-profile", async (req, res) => {
       const username = req.body.username;
       const bio = req.body.bio;
 
-      await db.query(
-        "UPDATE users SET username = $1, bio = $2 WHERE user_id = $3",
-        [username, bio, req.user.user_id]
+      await db.query("UPDATE users SET username = $1, bio = $2 WHERE user_id = $3;", [username, bio, req.user.user_id]);
+
+      const result = await db.query(
+        "SELECT * FROM users WHERE user_id = $1;",
+        [req.user.user_id]
       );
 
-      // Пренасочваме потребителя обратно към профила му
-      res.redirect(`/account/${req.user.user_id}`);
+      const updatedUser = result.rows[0];
+
+      // Пренасочване след успешна смяна на паролата
+      req.logout((err) => {
+        if (err) {
+          console.error("Error during logout:", err);
+          return res.status(500).render("error-message.ejs", {
+            errorMessage:
+              "Грешка при обновяване на сесията. Моля, опитайте отново.",
+          });
+        }
+
+        // Влизане отново с обновената информация
+        req.login(updatedUser, (err) => {
+          if (err) {
+            console.error("Error during re-login:", err);
+            return res.status(500).render("error-message.ejs", {
+              errorMessage: "Грешка при влизане след смяна на паролата.",
+            });
+          }
+
+          res.redirect("/account/" + req.user.user_id);
+        });
+      });
     } catch (err) {
-      console.log("Error updating profile picture: ", err);
+      console.log("Error updating profile : ", err);
       res.status(500).render("error-message.ejs", {
-        errorMessage: "Неуспешно качване на профилна снимка.",
+        errorMessage: "Неуспешно актуализиран на профила.",
       });
     }
   } else {
     res.redirect("/login");
   }
 });
+
+// UPDATE user's password
+app.post("/change-password", async (req, res) => {
+  if (req.isAuthenticated()) {
+    const oldPassword = req.body.oldPassword;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+
+    try {
+      // Проверка дали newPassword и confirmPassword съвпадат
+      if (newPassword !== confirmPassword) {
+        return res.render("edit-profile.ejs", {
+          errorMessage: "Новите пароли не съвпадат.",
+          hidden: false,
+        });
+      }
+
+      // Вземане на текущата парола от базата данни
+      const result = await db.query(
+        "SELECT password FROM users WHERE user_id = $1",
+        [req.user.user_id]
+      );
+      const storedHashedPassword = result.rows[0].password;
+
+      // Проверка дали старата парола съвпада
+      const isMatch = await bcrypt.compare(oldPassword, storedHashedPassword);
+      if (!isMatch) {
+        return res.render("edit-profile.ejs", {
+          errorMessage: "Старата парола не е правилна.",
+          hidden: false,
+        });
+      }
+
+      // Хеширане на новата парола
+      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds, async (err, hash) => {
+          if (err) {
+            console.error("Error hashing password:", err);
+            res.status(500).render("error-message.ejs", { errorMessage: err });
+          } else {
+            console.log("Hashed Password:", hash);
+
+            await db.query("UPDATE users SET password = $1 WHERE user_id = $2;", [hash, req.user.user_id]);
+
+            // Актуализация на базата данни
+            const updatedUserResult = await db.query(
+              "SELECT * FROM users WHERE user_id = $1;",
+              [req.user.user_id]
+            );
+
+            const updatedUser = updatedUserResult.rows[0];
+
+            // Пренасочване след успешна смяна на паролата
+            req.logout((err) => {
+              if (err) {
+                console.error("Error during logout:", err);
+                return res.status(500).render("error-message.ejs", {
+                  errorMessage:
+                    "Грешка при обновяване на сесията. Моля, опитайте отново.",
+                });
+              }
+
+              // Влизане отново с обновената информация
+              req.login(updatedUser, (err) => {
+                if (err) {
+                  console.error("Error during re-login:", err);
+                  return res.status(500).render("error-message.ejs", {
+                    errorMessage: "Грешка при влизане след смяна на паролата.",
+                  });
+                }
+
+                res.redirect("/account/" + req.user.user_id);
+              });
+            });
+          }
+      });
+    } catch (err) {
+      console.error("Error changing password:", err);
+      res.status(500).render("error-message.ejs", {
+        errorMessage: "Грешка при смяната на паролата.",
+      });
+    }
+  } else {
+    res.redirect("/login");
+  }
+});
+
 
 // READ an account Checked
 app.get("/account/:user_id", async (req, res) => {
