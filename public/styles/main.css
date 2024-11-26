@@ -323,7 +323,7 @@ h1 {
 
 .searchBox {
     display: flex;
-    max-width: 345px;
+    max-width: 800px;  
     margin: 0 auto;
     align-items: center;
     justify-content: space-between;
@@ -497,6 +497,7 @@ button:active {
   }
 
   .card .card-info {
+    min-width: 250px;
     display: flex;
     flex-flow: column nowrap;
     place-items: center;
@@ -559,7 +560,8 @@ button:active {
   }
 
   .posts-container {
-    margin-left: 80px;
+    margin-right: 80px;
+    margin-left: 50px;
     margin-top: 20px;
     flex-grow: 1;
     }
