@@ -110,6 +110,9 @@
 <body>
   <div class="container">
     <h1 class="heading">Регистрирай се</h1>
+    <% if (locals.errorMessage) { %>
+      <p style="color: red; font-size: 14px;"><%= errorMessage %></p>
+    <% } %>
     <form class="form" action="/register" method="POST">
       <input type="text" class="input" name="username" placeholder="Име" required>
       <input type="email" class="input" name="email" placeholder="Имейл" required>

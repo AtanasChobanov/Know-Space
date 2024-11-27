@@ -32,6 +32,9 @@
             </div>
         </form>
         <% if( channels && channels.length > 0) { %>
+            <% if (locals.infoMessage) {%>
+                <p class="text-center"><%= infoMessage %></p>
+            <% } %>
             <div class="channel-grid">
                 <% channels.forEach(function(channel) { %>
                     <div class="channel-card">
@@ -43,20 +46,24 @@
                         <p>Членове: <%= channel.members_count %></p>
                         <small>Създаден на: <%= channel.date_of_creation %></small>
 
-                        <% if (!(user.user_id === channel.admin_id)) { %>
-                            <!-- Показваме бутон "Излез от канала", ако потребителят е член -->
-                            <form action="/leave-channel/<%= channel.channel_id %>" method="POST">
+                        <% if (locals.infoMessage) { %>
+                            <form action="/join-channel/<%= channel.channel_id %>" method="POST">
                                 <div class="mt-2 btn-grop leave-channel">
-                                <button type="submit" class="button">Излез от канала</button>
+                                    <button type="submit" class="button">Присъедини се</button>
                                 </div>
                             </form>
-                        <% } %>
-
-                        <% if(user.user_id === channel.admin_id) { %>
+                        <% } else if(user.user_id === channel.admin_id) { %>
                             <div class="mt-2 btn-grop">
                                 <a href="/<%= channel.channel_id %>/edit" class="button">Редактиране</a>
                                 <a href="/<%= channel.channel_id %>/delete" class="button delete-button">Изтриване</a>
                             </div>
+                        <% } else {%>
+                            <!-- Показваме бутон "Излез от канала", ако потребителят е член -->
+                            <form action="/leave-channel/<%= channel.channel_id %>" method="POST">
+                                <div class="mt-2 btn-grop leave-channel">
+                                    <button type="submit" class="button">Излез от канала</button>
+                                </div>
+                            </form>
                         <% } %>
                     </div>
                 <% }); %>

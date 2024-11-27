@@ -6,6 +6,7 @@ import bcrypt from "bcrypt";
 import session from "express-session";
 import passport from "passport";
 import { Strategy } from "passport-local";
+import flash from "connect-flash";
 import env from "dotenv";
 
 const app = express();
@@ -14,7 +15,12 @@ const saltRounds = 10;
 env.config();
 
 // Създаване на масив с имена на профилни снимки
-const defaultAvatars = ["default-avatar-1.jpg", "default-avatar-2.jpg", "default-avatar-3.jpg", "default-avatar-4.jpg"];
+const defaultAvatars = [
+  "default-avatar-1.jpg",
+  "default-avatar-2.jpg",
+  "default-avatar-3.jpg",
+  "default-avatar-4.jpg",
+];
 
 // Initialize Cookies and Sessions middlewares
 app.use(
@@ -37,8 +43,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride("_method"));
 
-
-// Middleware за глобални данни
+// Middlewares for global data
 app.use((req, res, next) => {
   if (req.user) {
     // Ако потребителят е логнат, запазваме целия обект user
@@ -50,6 +55,14 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.errorMessage = req.flash("error"); 
+  next();
+});
+
+
 // Connecting to PostgreSQL server
 const db = new pg.Client({
   user: process.env.DB_USER,
@@ -60,38 +73,52 @@ const db = new pg.Client({
 });
 db.connect();
 
-// READING channels to display
-async function readChannels(user_id) {
-  const query = `
-    SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
-    FROM channels ch
-    JOIN users u ON ch.admin_id = u.user_id
-    LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
-    WHERE ch.channel_id IN (
-      SELECT channel_id 
-      FROM members_of_channels 
-      WHERE user_id = $1
-    )
-    GROUP BY ch.channel_id, u.username, u.profile_picture
-    ORDER BY ch.date_of_creation DESC;
-  `;
+// READ channels to display
+async function getUserChannels(userId) {
+  try {
+    const result = await db.query(
+      `SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
+       FROM channels ch
+       JOIN users u ON ch.admin_id = u.user_id
+       LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
+       WHERE ch.channel_id IN (
+         SELECT channel_id 
+         FROM members_of_channels 
+         WHERE user_id = $1
+       )
+       GROUP BY ch.channel_id, u.username, u.profile_picture
+       ORDER BY ch.date_of_creation DESC`,
+      [userId]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching user channels:", err);
+    throw err;
+  }
+}
 
-  const result = await db.query(query, [user_id]);
-
-  let channels = [];
-  result.rows.forEach((channel) => {
-    channel.date_of_creation = new Date(
-      channel.date_of_creation
-    ).toDateString();
-    channels.push(channel);
-  });
-
-  console.log(channels);
-  return channels;
+// READ recent posts
+async function getRecentChannels(limit = 8) {
+  try {
+    const result = await db.query(
+      `SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
+       FROM channels ch
+       JOIN users u ON ch.admin_id = u.user_id
+       LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
+       GROUP BY ch.channel_id, u.username, u.profile_picture
+       ORDER BY ch.date_of_creation DESC
+       LIMIT $1`,
+      [limit]
+    );
+    return result.rows;
+  } catch (err) {
+    console.error("Error fetching recent channels:", err);
+    throw err;
+  }
 }
 
 // READING a specific channel to modify
-async function readChannel(id) {
+async function getChannel(id) {
   const result = await db.query(
     "SELECT * FROM channels WHERE channel_id = $1;",
     [id]
@@ -200,15 +227,29 @@ async function joinChannel(user_id, channel_id) {
 
 // Home route - veiws all channels Checked
 app.get("/", async (req, res) => {
-  console.log(req.user);
   if (req.isAuthenticated()) {
     try {
-      const channels = await readChannels(req.user.user_id);
-      res.render("view-channels.ejs", { channels });
+      const userChannels = await getUserChannels(req.user.user_id);
+
+      // Ако потребителят няма канали, взимаме най-новите
+      if (userChannels.length === 0) {
+        const recentChannels = await getRecentChannels();
+        return res.render("view-channels.ejs", {
+          channels: recentChannels,
+          infoMessage:
+            "Не сте член на нито един канал. Ето някои от най-новите канали, които можете да разгледате.",
+        });
+      }
+
+      // Потребителят има канали
+      res.render("view-channels.ejs", {
+        channels: userChannels,
+      });
     } catch (err) {
-      console.log("Error executing query: " + err);
+      console.log("Error in Home route: ", err);
       res.status(500).render("error-message.ejs", {
-        errorMessage: "Error loading channels.",
+        errorMessage:
+          "Възникна проблем при зареждането на каналите. Опитайте отново.",
       });
     }
   } else {
@@ -242,7 +283,7 @@ app.post("/register", async (req, res) => {
     ]);
 
     if (checkResult.rows.length > 0) {
-      res.render("error-message.ejs", {
+      res.render("register.ejs", {
         errorMessage: "Имейлът е вече регистриран. Пробвай да влезеш.",
       });
     } else {
@@ -290,12 +331,14 @@ app.post("/edit-profile", async (req, res) => {
       const username = req.body.username;
       const bio = req.body.bio;
 
-      await db.query("UPDATE users SET username = $1, bio = $2 WHERE user_id = $3;", [username, bio, req.user.user_id]);
-
-      const result = await db.query(
-        "SELECT * FROM users WHERE user_id = $1;",
-        [req.user.user_id]
+      await db.query(
+        "UPDATE users SET username = $1, bio = $2 WHERE user_id = $3;",
+        [username, bio, req.user.user_id]
       );
+
+      const result = await db.query("SELECT * FROM users WHERE user_id = $1;", [
+        req.user.user_id,
+      ]);
 
       const updatedUser = result.rows[0];
 
@@ -365,14 +408,20 @@ app.post("/change-password", async (req, res) => {
       }
 
       // Хеширане на новата парола
-      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds, async (err, hash) => {
+      const hashedNewPassword = await bcrypt.hash(
+        newPassword,
+        saltRounds,
+        async (err, hash) => {
           if (err) {
             console.error("Error hashing password:", err);
             res.status(500).render("error-message.ejs", { errorMessage: err });
           } else {
             console.log("Hashed Password:", hash);
 
-            await db.query("UPDATE users SET password = $1 WHERE user_id = $2;", [hash, req.user.user_id]);
+            await db.query(
+              "UPDATE users SET password = $1 WHERE user_id = $2;",
+              [hash, req.user.user_id]
+            );
 
             // Актуализация на базата данни
             const updatedUserResult = await db.query(
@@ -405,7 +454,8 @@ app.post("/change-password", async (req, res) => {
               });
             });
           }
-      });
+        }
+      );
     } catch (err) {
       console.error("Error changing password:", err);
       res.status(500).render("error-message.ejs", {
@@ -416,7 +466,6 @@ app.post("/change-password", async (req, res) => {
     res.redirect("/login");
   }
 });
-
 
 // READ an account Checked
 app.get("/account/:user_id", async (req, res) => {
@@ -471,7 +520,7 @@ app.get("/view/:channel_id", async (req, res) => {
         });
       }
 
-      const channel = await readChannel(req.params.channel_id);
+      const channel = await getChannel(req.params.channel_id);
       const posts = await readPosts(req.params.channel_id);
 
       res.render("view-posts.ejs", {
@@ -514,7 +563,7 @@ app.get("/:channel_id/new-post", async (req, res) => {
         });
       }
 
-      const channel = await readChannel(req.params.channel_id);
+      const channel = await getChannel(req.params.channel_id);
       res.render("new-post.ejs", {
         channel_id: channel.channel_id,
       });
@@ -694,7 +743,7 @@ app.post("/:channel_id/create-post", async (req, res) => {
 app.get("/:channel_id/edit", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      const channel = await readChannel(req.params.channel_id);
+      const channel = await getChannel(req.params.channel_id);
 
       if (req.user.user_id === channel.admin_id) {
         res.render("edit-channel.ejs", {
@@ -786,7 +835,7 @@ app.patch("/:channel_id/edit-post/:post_id", async (req, res) => {
 app.get("/:channel_id/delete", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
-      const channel = await readChannel(req.params.channel_id);
+      const channel = await getChannel(req.params.channel_id);
 
       if (req.user.user_id === channel.admin_id) {
         res.render("delete-channel.ejs", {
@@ -878,6 +927,7 @@ app.post(
   passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/login",
+    failureFlash: true,
   })
 );
 
@@ -909,12 +959,12 @@ passport.use(
             if (result) {
               return cb(null, user);
             } else {
-              return cb(null, false);
+              return cb(null, false, { message: "Грешна парола." });
             }
           }
         });
       } else {
-        return cb("User not found");
+        return cb(null, false, { message: "Имейлът не съществува." });
       }
     } catch (err) {
       return cb(err);
