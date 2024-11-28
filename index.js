@@ -14,7 +14,7 @@ const port = process.env.PORT || 3000;
 const saltRounds = 10;
 env.config();
 
-// Създаване на масив с имена на профилни снимки
+// Array for random profile picture selection
 const defaultAvatars = [
   "default-avatar-1.jpg",
   "default-avatar-2.jpg",
@@ -37,7 +37,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middlewares
+// Other middlewares
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -46,10 +46,10 @@ app.use(methodOverride("_method"));
 // Middlewares for global data
 app.use((req, res, next) => {
   if (req.user) {
-    // Ако потребителят е логнат, запазваме целия обект user
+    // if user is logged in
     res.locals.user = req.user;
   } else {
-    // Ако потребителят не е логнат, задаваме null
+    // if user is logged out
     res.locals.user = null;
   }
   next();
@@ -90,7 +90,16 @@ async function getUserChannels(userId) {
        ORDER BY ch.date_of_creation DESC`,
       [userId]
     );
-    return result.rows;
+
+    let channels = [];
+    result.rows.forEach((channel) => {
+      channel.date_of_creation = new Date(
+        channel.date_of_creation
+      ).toDateString();
+      channels.push(channel);
+    });
+
+    return channels;
   } catch (err) {
     console.error("Error fetching user channels:", err);
     throw err;
@@ -117,7 +126,7 @@ async function getRecentChannels(limit = 8) {
   }
 }
 
-// READING a specific channel to modify
+// READ a specific channel to modify
 async function getChannel(id) {
   const result = await db.query(
     "SELECT * FROM channels WHERE channel_id = $1;",
@@ -129,7 +138,7 @@ async function getChannel(id) {
   return channel;
 }
 
-// READING posts from a channel to display
+// READ posts from a channel to display
 async function readPosts(channel_id) {
   const result = await db.query(
     "SELECT ch.name, post_id, title, content, author_id, u.username AS author, p.date_of_creation, date_of_last_edit " +
@@ -151,7 +160,7 @@ async function readPosts(channel_id) {
   return posts;
 }
 
-// READING a specific post to modify
+// READ a specific post to modify
 async function findPost(post_id) {
   const result = await db.query("SELECT * FROM posts WHERE post_id = $1;", [
     post_id,
@@ -161,7 +170,7 @@ async function findPost(post_id) {
   return post;
 }
 
-// READING search result to display channels
+// READ search result to display channels
 async function searchChannels(searchedItem) {
   const result = await db.query(
     "SELECT channel_id, ch.name, date_of_creation, admin_id, u.profile_picture AS admin_picture, " +
@@ -183,7 +192,7 @@ async function searchChannels(searchedItem) {
   return channels;
 }
 
-// READING search result to display channels
+// READ search result to display channels
 async function searchPosts(searchedItem) {
   const result = await db.query(
     "SELECT post_id, p.title, date_of_creation, date_of_last_edit, author_id, channel_id, " +
@@ -202,6 +211,7 @@ async function searchPosts(searchedItem) {
   return posts;
 }
 
+// READ members of channels
 async function isUserMemberOfChannel(user_id, channel_id) {
   const query = `
     SELECT 1
@@ -212,7 +222,7 @@ async function isUserMemberOfChannel(user_id, channel_id) {
   return result.rowCount > 0; // Ако има ред, значи потребителят е член
 }
 
-// Функция за добавяне на потребител към канал
+// CREATE member of a channel
 async function joinChannel(user_id, channel_id) {
   try {
     await db.query(
@@ -225,13 +235,12 @@ async function joinChannel(user_id, channel_id) {
   }
 }
 
-// Home route - veiws all channels Checked
+// Home route - veiws all channels 
 app.get("/", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const userChannels = await getUserChannels(req.user.user_id);
 
-      // Ако потребителят няма канали, взимаме най-новите
       if (userChannels.length === 0) {
         const recentChannels = await getRecentChannels();
         return res.render("view-channels.ejs", {
@@ -241,7 +250,6 @@ app.get("/", async (req, res) => {
         });
       }
 
-      // Потребителят има канали
       res.render("view-channels.ejs", {
         channels: userChannels,
       });
@@ -257,23 +265,23 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Render the login form Checked
+// Render the login form 
 app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
 
+// Render the register form 
 app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
 
-// Register new user Checked
+// Register new user 
 app.post("/register", async (req, res) => {
   const username = req.body.username;
   const email = req.body.email;
   const password = req.body.password;
   const userType = req.body.type;
 
-  // Избиране на случайна снимка от масива
   const randomAvatar =
     defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
 
@@ -287,7 +295,7 @@ app.post("/register", async (req, res) => {
         errorMessage: "Имейлът е вече регистриран. Пробвай да влезеш.",
       });
     } else {
-      // Хеширане на паролата и записване в базата данни
+      // Save hashed password in DB
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         if (err) {
           console.error("Error hashing password:", err);
@@ -295,7 +303,6 @@ app.post("/register", async (req, res) => {
         } else {
           console.log("Hashed Password:", hash);
 
-          // Вмъкване на потребител с профилна снимка по подразбиране
           const result = await db.query(
             "INSERT INTO users (email, password, username, user_type, profile_picture) VALUES ($1, $2, $3, $4, $5) RETURNING *",
             [email, hash, username, userType, randomAvatar]
@@ -304,7 +311,7 @@ app.post("/register", async (req, res) => {
           const user = result.rows[0];
           req.login(user, (err) => {
             console.log(err);
-            res.redirect("/"); // Пренасочване след успешна регистрация
+            res.redirect("/");
           });
         }
       });
@@ -315,7 +322,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Маршрут за показване на формата за редактиране на профил
+// Get edit profile form
 app.get("/edit-profile", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("edit-profile.ejs");
@@ -324,7 +331,7 @@ app.get("/edit-profile", (req, res) => {
   }
 });
 
-// Маршрут за обработка на формата за редактиране
+// UPDATE profile
 app.post("/edit-profile", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -467,7 +474,7 @@ app.post("/change-password", async (req, res) => {
   }
 });
 
-// READ an account Checked
+// READ an account 
 app.get("/account/:user_id", async (req, res) => {
   if (req.isAuthenticated()) {
     const userId = req.params.user_id;
@@ -505,7 +512,7 @@ app.get("/account/:user_id", async (req, res) => {
   }
 });
 
-// READ all posts in a channel Checked
+// READ all posts in a channel
 app.get("/view/:channel_id", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -514,9 +521,9 @@ app.get("/view/:channel_id", async (req, res) => {
         req.params.channel_id
       );
 
-      if (!isMember) {
+      if (!(isMember || req.user.user_type === "Администратор")) {
         return res.status(403).render("error-message.ejs", {
-          errorMessage: "You are not a member of this channel.",
+          errorMessage: "Не си член на този канал.",
         });
       }
 
@@ -538,7 +545,7 @@ app.get("/view/:channel_id", async (req, res) => {
   }
 });
 
-// READ form for creating new channel Checked
+// READ form for creating new channel
 app.get("/new-channel", (req, res) => {
   if (req.isAuthenticated()) {
     res.render("new-channel.ejs");
@@ -547,7 +554,7 @@ app.get("/new-channel", (req, res) => {
   }
 });
 
-// READ form for creating a new post in a channel Checked
+// READ form for creating a new post in a channel
 app.get("/:channel_id/new-post", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -557,9 +564,9 @@ app.get("/:channel_id/new-post", async (req, res) => {
         req.params.channel_id
       );
 
-      if (!isMember) {
+      if (!(isMember || req.user.user_type === "Администратор")) {
         return res.status(403).render("error-message.ejs", {
-          errorMessage: "You are not a member of this channel.",
+          errorMessage: "Не си член на този канал.",
         });
       }
 
@@ -628,7 +635,7 @@ app.post("/leave-channel/:channel_id", async (req, res) => {
   }
 });
 
-// READ searched channel Checked
+// READ searched channel
 app.post("/search-channel", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -658,7 +665,7 @@ app.post("/search-channel", async (req, res) => {
   }
 });
 
-// READ searched post Checked
+// READ searched post
 app.post("/search-post", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -675,7 +682,7 @@ app.post("/search-post", async (req, res) => {
   }
 });
 
-// CREATE new channel Checked
+// CREATE new channel 
 app.post("/create-channel", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -713,7 +720,7 @@ app.post("/create-channel", async (req, res) => {
   }
 });
 
-// CREATE new post in a channel Checked
+// CREATE new post in a channel 
 app.post("/:channel_id/create-post", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -739,18 +746,17 @@ app.post("/:channel_id/create-post", async (req, res) => {
   }
 });
 
-// READ form for updating a channel Checked
+// READ form for updating a channel
 app.get("/:channel_id/edit", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const channel = await getChannel(req.params.channel_id);
 
-      if (req.user.user_id === channel.admin_id) {
+      if (req.user.user_id === channel.admin_id || req.user.user_type === "Администратор") {
         res.render("edit-channel.ejs", {
           channel: channel,
         });
       } else {
-        // Обмсли за връщане на някаква грешка или просто връщане в заглавната станица
         res.redirect("/");
       }
     } catch (err) {
@@ -763,19 +769,18 @@ app.get("/:channel_id/edit", async (req, res) => {
   }
 });
 
-// READ form for updating a post in a channel Checked
+// READ form for updating a post in a channel
 app.get("/:channel_id/edit/:post_id", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const post = await findPost(req.params.post_id);
 
-      if (req.user.user_id === post.author_id) {
+      if (req.user.user_id === post.author_id || req.user.user_type === "Администратор") {
         res.render("edit-post.ejs", {
           post: post,
           channel_id: req.params.channel_id,
         });
       } else {
-        // Обмсли за връщане на някаква грешка или просто връщане в заглавната станица
         res.redirect("/");
       }
     } catch (err) {
@@ -789,7 +794,7 @@ app.get("/:channel_id/edit/:post_id", async (req, res) => {
   }
 });
 
-// UPDATE a channel Checked
+// UPDATE a channel 
 app.patch("/:channel_id/edit", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -810,7 +815,7 @@ app.patch("/:channel_id/edit", async (req, res) => {
   }
 });
 
-// UPDATE a post in a channel Checked
+// UPDATE a post in a channel 
 app.patch("/:channel_id/edit-post/:post_id", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -831,13 +836,13 @@ app.patch("/:channel_id/edit-post/:post_id", async (req, res) => {
   }
 });
 
-// READ form for deleting channel Checked
+// READ form for deleting channel
 app.get("/:channel_id/delete", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const channel = await getChannel(req.params.channel_id);
 
-      if (req.user.user_id === channel.admin_id) {
+      if (req.user.user_id === channel.admin_id || req.user.user_type === "Администратор") {
         res.render("delete-channel.ejs", {
           channel: channel,
         });
@@ -855,19 +860,18 @@ app.get("/:channel_id/delete", async (req, res) => {
   }
 });
 
-// READ from for deleting a post in a channel Checked
+// READ from for deleting a post in a channel 
 app.get("/:channel_id/delete-post/:post_id", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
       const post = await findPost(req.params.post_id);
 
-      if (req.user.user_id === post.author_id) {
+      if (req.user.user_id === post.author_id || req.user.user_type === "Администратор") {
         res.render("delete-post.ejs", {
           post: post,
           channel_id: req.params.channel_id,
         });
       } else {
-        // Обмсли за връщане на някаква грешка или просто връщане в заглавната станица
         res.redirect("/");
       }
     } catch (err) {
@@ -881,7 +885,7 @@ app.get("/:channel_id/delete-post/:post_id", async (req, res) => {
   }
 });
 
-// DELETE a channel Checked
+// DELETE a channel 
 app.delete("/:channel_id/delete", async (req, res) => {
   if (req.isAuthenticated()) {
     try {
@@ -901,7 +905,7 @@ app.delete("/:channel_id/delete", async (req, res) => {
   }
 });
 
-// DELETE a post in a channel Checked
+// DELETE a post in a channel 
 app.delete("/:channel_id/delete-post/:post_id", async (req, res) => {
   if (req.isAuthenticated()) {
     try {

@@ -8,7 +8,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/main.css" />
-    <link rel="icon" href="/images/icon.png" type="image/png">  
+    <link rel="icon" href="/images/icon.png" type="image/png" />  
 
     <title>KnowSpace</title>
   </head>
@@ -16,48 +16,44 @@
     <!-- Хедър с класове от Bootstrap -->
     <header class="header p-3 mb-3 border-bottom">
       <div class="container">
-        <div
-          class="d-flex flex-wrap justify-content-center justify-content-lg-start"
-        >
+        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start">
           <a
             href="/"
             class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
           >
             <img
               src="/images/KnowSpace 1-1.png"
-              alt="Image description"
+              alt="KnowSpace logo"
               class="header-image"
             />
           </a>
 
-          <ul
-            class="nav col-12 col-lg-auto ms-lg-auto mb-2 mb-md-0"
-          >
+          <!-- Навигация с бутоните -->
+          <ul class="nav col-12 col-lg-auto ms-lg-auto mb-2 mb-md-0">
             <li>
               <button onclick="window.location.href='/'" class="header-button">
                 Начало
               </button>
             </li>
             <li>
-              <button
-                onclick="window.location.href='/new-channel'"
-                class="header-button create-channel-button"
-              >
+              <button onclick="window.location.href='/new-channel'" class="header-button create-channel-button">
                 Създай нов канал
               </button>
             </li>
             <li>
-              <button
-                onclick="window.location.href='/logout'"
-                class="header-button login-button"
-              >
+              <button onclick="window.location.href='/logout'" class="header-button login-button">
                 Изход
               </button>
             </li>
-            <li>
-              <a href="/account/<%= user.user_id %>" class="profile-link"><img src="/uploads/profile-pictures/<%= user.profile_picture %>" alt="Profile" class="profile"></a>
-            </li>
           </ul>
+
+          <a href="/account/<%= user.user_id %>" class="profile-link">
+            <img
+              src="/uploads/profile-pictures/<%= user.profile_picture %>"
+              alt="Profile"
+              class="profile"
+            />
+          </a>
         </div>
       </div>
     </header>

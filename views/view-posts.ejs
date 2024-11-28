@@ -59,7 +59,7 @@
                         <small class="text-center">Създаден на: <%= post.date_of_creation %></small>
                     <% } %>
                     
-                    <% if(user.user_id === post.author_id) { %>
+                    <% if(user.user_id === post.author_id  || user.user_type === "Администратор") { %>
                     <a href="/<%= channel.channel_id %>/edit/<%= post.post_id %>" class="button edit-button">Редактиране</a>
                     <a href="/<%= channel.channel_id %>/delete-post/<%= post.post_id %>" class="button delete-button">Изтриване</a>
                     <% } %>
