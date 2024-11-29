@@ -77,6 +77,10 @@ h1 {
     margin-left: 10px;
 }
 
+p.text-left {
+    margin: 0;
+}
+
 .channel-name a {
     text-decoration: none;
     color: #007bff;
