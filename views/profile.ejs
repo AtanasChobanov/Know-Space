@@ -4,37 +4,38 @@
   <div class="card-container">
     <div class="card">
       <div class="card-info">
-        <span><img src="/uploads/profile-pictures/<%= account.profile_picture %>" alt="Profile" class="avatar"></span>
+        <span
+          ><img
+            src="<%= account.profile_picture %>"
+            alt="Profile"
+            class="avatar"
+        /></span>
         <h3><%= account.username %></h3>
-        <p><%= account.user_type  %></p>
-        
+        <p><%= account.user_type %></p>
+
         <% if(account.bio) { %>
-          <p>Био: <%= account.bio %></p>
-        <% } %>
-        <% if(account.user_id === user.user_id) { %>
-          <a href="/edit-profile" class="btn">Редактиране</a>
+        <p>Био: <%= account.bio %></p>
+        <% } %> <% if(account.user_id === user.user_id) { %>
+        <a href="/edit-profile" class="btn">Редактиране</a>
         <% } %>
       </div>
     </div>
   </div>
   <div class="posts-container">
-    
     <% if(account.user_id === user.user_id) { %>
-      <h3>Моите постове</h3>
+    <h3>Моите постове</h3>
     <% } else { %>
-      <h3>Постове на <%= account.username %></h3>
+    <h3>Постове на <%= account.username %></h3>
     <% } %>
     <ul>
-      <% if (posts && posts.length > 0) { %>
-        <% posts.forEach(post => { %>
-          <li>
-            <h4><%= post.title %></h4>
-            <p><%= post.content %></p>
-            <p><small>Създаден на: <%= post.date_of_creation %></small></p>
-          </li>
-        <% }) %>
-      <% } else { %>
-        <li>Няма налични постове.</li>
+      <% if (posts && posts.length > 0) { %> <% posts.forEach(post => { %>
+      <li>
+        <h4><%= post.title %></h4>
+        <p><%= post.content %></p>
+        <p><small>Създаден на: <%= post.date_of_creation %></small></p>
+      </li>
+      <% }) %> <% } else { %>
+      <li>Няма налични постове.</li>
       <% } %>
     </ul>
   </div>

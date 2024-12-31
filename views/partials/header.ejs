@@ -8,7 +8,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/main.css" />
-    <link rel="icon" href="/images/icon.png" type="image/png" />  
+    <link rel="icon" href="/images/small-icon.png" type="image/png" />
 
     <title>KnowSpace</title>
   </head>
@@ -16,7 +16,9 @@
     <!-- Хедър с класове от Bootstrap -->
     <header class="header p-3 mb-3 border-bottom">
       <div class="container">
-        <div class="d-flex flex-wrap justify-content-center justify-content-lg-start">
+        <div
+          class="d-flex flex-wrap justify-content-center justify-content-lg-start"
+        >
           <a
             href="/"
             class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
@@ -36,12 +38,18 @@
               </button>
             </li>
             <li>
-              <button onclick="window.location.href='/new-channel'" class="header-button create-channel-button">
+              <button
+                onclick="window.location.href='/new-channel'"
+                class="header-button create-channel-button"
+              >
                 Създай нов канал
               </button>
             </li>
             <li>
-              <button onclick="window.location.href='/logout'" class="header-button login-button">
+              <button
+                onclick="window.location.href='/logout'"
+                class="header-button login-button"
+              >
                 Изход
               </button>
             </li>
@@ -49,7 +57,7 @@
 
           <a href="/account/<%= user.user_id %>" class="profile-link">
             <img
-              src="/uploads/profile-pictures/<%= user.profile_picture %>"
+              src="<%= user.profile_picture %>"
               alt="Profile"
               class="profile"
             />

@@ -653,3 +653,31 @@ button:active {
   .posts-container li p {
     color: #555;
   }
+.wikipedia-result {
+  margin: 15px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.wikipedia-result h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+
+.wikipedia-result p {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #555;
+}
+
+.wikipedia-result a {
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.wikipedia-result a:hover {
+  text-decoration: underline;
+}

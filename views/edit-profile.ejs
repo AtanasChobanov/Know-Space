@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/images/icon.png" type="image/png">
+    <link rel="icon" href="/images/small-icon.png" type="image/png">
     <title>Редактиране на профил</title>
     <link rel="stylesheet" href="/styles/edit-profile.css">
 </head>
 <body>
     <div class="container">
         <h2 class="heading">Редактиране на профил</h2>
+        <% if (locals.errorMessage) { %>
+            <p style="color: red; font-size: 14px;"><%= errorMessage %></p> <!-- Display error message if exists -->
+          <% } %>
         <form class="form" method="POST" action="/edit-profile">
             <input type="text" class="input" name="username" placeholder="Име..." value="<%= user.username %>" required>
             <textarea class="input" name="bio" placeholder="Въведете описание..." maxlength="60"><%= user.bio %></textarea>
@@ -17,19 +20,20 @@
         </form>
 
         <button type="button" class="submit-button" onclick="openPopup()">Смяна на парола</button>
-
-<div id="passwordPopup" class="popup">
-    <div class="popup-content">
-        <h3>Смяна на парола</h3>
-        <form method="POST" action="/change-password">
-            <input type="password" class="input" name="oldPassword" placeholder="Стара парола">
-            <input type="password" class="input" name="newPassword" placeholder="Нова парола">
-            <input type="password" class="input" name="confirmPassword" placeholder="Потвърдете новата парола">
-            <button type="submit">Промени парола</button>
-        </form>
-        <span class="close" onclick="closePopup()">Затвори</span>
     </div>
-</div>
+
+    <div id="passwordPopup" class="popup">
+        <div class="popup-content">
+            <h3>Смяна на парола</h3>
+            <form method="POST" action="/change-password">
+                <input type="password" class="input" name="oldPassword" placeholder="Стара парола">
+                <input type="password" class="input" name="newPassword" placeholder="Нова парола">
+                <input type="password" class="input" name="confirmPassword" placeholder="Потвърдете новата парола">
+                <button type="submit">Промени парола</button>
+            </form>
+            <span class="close" onclick="closePopup()">Затвори</span>
+        </div>
+    </div>
     <script src="/functions/edit-profile.js"></script>
 </body>
 </html>
