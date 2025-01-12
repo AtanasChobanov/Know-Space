@@ -40,13 +40,14 @@ passport.use(
         },
         async function verify(accessToken, refreshToken, profile, cb) {
             try {
-                const user = await User.getForeignUserByEmail(profile.email);
+                const user = await User.getGoogleUserByEmail(profile.email);
 
                 // Checks if user exists with normal password
                 if (user) {
                     if (user.password !== "google") {
                         return cb(null, false, { message: "Имейлът е регистриран чрез парола." });
                     }
+                    return cb(null, user);
                 }
                 else {
                     const newUser = await User.create(
@@ -59,7 +60,6 @@ passport.use(
 
                     return cb(null, newUser);
                 }
-                return cb(null, user);
             } catch (err) {
                 return cb(err);
             }

@@ -189,6 +189,16 @@ class User {
     }
     return null;
   }
+
+  static async getGoogleUserByEmail(email) {
+    let user = await User.getForeignUserByEmail(email);
+    if (user) {
+      user = await User.#getById(user.userId);
+      return user;
+    } else {
+      return null;
+    }
+  }
 }
 
 export default User;
