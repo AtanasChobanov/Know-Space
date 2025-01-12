@@ -64,6 +64,11 @@ h1 {
     text-align: center;
 }
 
+.channel-name > h1 {
+    text-align: start;
+    margin-left: 1rem;
+}
+
 .nav-link {
     margin-right: 15px;
 }
@@ -268,58 +273,6 @@ p.text-left {
     height: 20px;
 }
 
-@media (max-width: 992px) {
-    .header-button {
-        font-size: 0.9rem;
-        padding: 8px 16px;
-        margin: 5px;
-    }
-
-    .nav {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .nav li {
-        flex: 1 0 100%;
-        text-align: center;
-    }
-
-    .login-button,
-    .create-channel-button {
-        position: relative;
-        display: inline-block;
-        margin: 10px;
-    }
-
-    .create-channel-button {
-        margin-left: 10px;
-    }
-
-    .header-button {
-        margin: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .header-button {
-        font-size: 12px;
-        padding: 6px 12px;
-    }
-
-    .login-button,
-    .create-channel-button {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-
-    .create-channel-button {
-        margin-left: 0;
-    }
-}
-
 .error-message {
     background-color: #f8d7da;
     color: #721c24;
@@ -378,7 +331,7 @@ p.text-left {
 
 .searchBox {
     display: flex;
-    max-width: 700px;  
+    flex: 1;
     margin: 20px auto;
     align-items: center;
     justify-content: space-between;
@@ -680,4 +633,77 @@ button:active {
 
 .wikipedia-result a:hover {
   text-decoration: underline;
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 992px) {
+    .header-button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+        margin: 5px;
+    }
+
+    .nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav li {
+        flex: 1 0 100%;
+        text-align: center;
+    }
+
+    .login-button,
+    .create-channel-button {
+        position: relative;
+        display: inline-block;
+        margin: 10px;
+    }
+
+    .create-channel-button {
+        margin-left: 10px;
+    }
+
+    .header-button {
+        margin: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-button {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .login-button,
+    .create-channel-button {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .create-channel-button {
+        margin-left: 0;
+    }
+
+    .search-form {
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .searchBox {
+        width: 100%;
+        margin: 0;
+    }
+
+    .search-form > .button {
+        width: 100%;
+    }
 }
