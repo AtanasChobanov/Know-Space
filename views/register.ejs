@@ -10,16 +10,19 @@
 <body>
   <div class="container">
     <h1 class="heading">Регистрирай се</h1>
-    <form class="form" action="/signup" method="POST">
-      <input type="text" class="input" name="name" placeholder="Име" required>
+    <% if (locals.errorMessage) { %>
+      <p style="color: red; font-size: 14px;"><%= errorMessage %></p>
+    <% } %>
+    <form class="form" action="/register" method="POST">
+      <input type="text" class="input" name="username" placeholder="Име" required>
       <input type="email" class="input" name="email" placeholder="Имейл" required>
       <input type="password" class="input" name="password" placeholder="Парола" required>
       
-      <select name="user-role" id="user-role" class="input" required>
+      <select name="type" id="user-role" class="input" required>
         <option value="" disabled selected>Избери категория</option>
-        <option value="student">Ученик</option>
-        <option value="teacher">Учител</option>
-        <option value="other">Друго</option>
+        <option value="Ученик">Ученик</option>
+        <option value="Учител">Учител</option>
+        <option value="Друг">Друг</option>
       </select>
 
       <button type="submit" class="submit-button">Регистриране</button>

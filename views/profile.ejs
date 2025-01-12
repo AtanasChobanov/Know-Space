@@ -6,23 +6,23 @@
       <div class="card-info">
         <span
           ><img
-            src="<%= account.profile_picture %>"
+            src="<%= account.profilePicture %>"
             alt="Profile"
             class="avatar"
         /></span>
         <h3><%= account.username %></h3>
-        <p><%= account.user_type %></p>
+        <p><%= account.userType %></p>
 
         <% if(account.bio) { %>
         <p>Био: <%= account.bio %></p>
-        <% } %> <% if(account.user_id === user.user_id) { %>
+        <% } %> <% if(account.userId === user.userId) { %>
         <a href="/edit-profile" class="btn">Редактиране</a>
         <% } %>
       </div>
     </div>
   </div>
   <div class="posts-container">
-    <% if(account.user_id === user.user_id) { %>
+    <% if(account.userId === user.userId) { %>
     <h3>Моите постове</h3>
     <% } else { %>
     <h3>Постове на <%= account.username %></h3>
@@ -32,7 +32,7 @@
       <li>
         <h4><%= post.title %></h4>
         <p><%= post.content %></p>
-        <p><small>Създаден на: <%= post.date_of_creation %></small></p>
+        <p><small>Създаден на: <%= post.dateOfCreation %></small></p>
       </li>
       <% }) %> <% } else { %>
       <li>Няма налични постове.</li>

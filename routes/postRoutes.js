@@ -1,25 +1,26 @@
 import express from "express";
-import {
-  showSearchedPosts,
-  getNewPostPage,
-  createNewPostController,
-  getEditPostPage,
-  updatePostController,
-  getDeletePostPage,
-  deletePostController,
-} from "../controllers/postController.js";
+import PostController from "../controllers/postController.js";
 
 const router = express.Router();
 
-router.get("/:channel_id/new-post", getNewPostPage);
-router.post("/:channel_id/create-post", createNewPostController);
+router.get("/:channelId/new-post", PostController.getNewPostPage);
+router.post("/:channelId/create-post", PostController.createController);
 
-router.get("/:channel_id/edit/:post_id", getEditPostPage);
-router.patch("/:channel_id/edit-post/:post_id", updatePostController);
+router.get("/:channelId/edit/:postId", PostController.getEditPostPage);
+router.patch(
+  "/:channelId/edit-post/:postId",
+  PostController.updateController
+);
 
-router.get("/:channel_id/delete-post/:post_id", getDeletePostPage);
-router.delete("/:channel_id/delete-post/:post_id", deletePostController);
+router.get(
+  "/:channelId/delete-post/:postId",
+  PostController.getDeletePostPage
+);
+router.delete(
+  "/:channelId/delete-post/:postId",
+  PostController.deleteController
+);
 
-router.post("/search-post", showSearchedPosts);
+router.post("/search-post/:channelId", PostController.showSearchedPostsController);
 
 export default router;

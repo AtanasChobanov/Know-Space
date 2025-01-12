@@ -2,7 +2,7 @@
 
 <div class="container">
     <h2>Редактиране на пост</h2>
-    <form action="/<%= channel_id %>/edit-post/<%= post.post_id %>?_method=PATCH" method="POST">
+    <form action="/<%= channelId %>/edit-post/<%= post.postId %>?_method=PATCH" method="POST">
         <input name="title" class="form-control mb-2" type="text" value="<%= post.title %>" required>
         <textarea name="content" class="form-control mb-2" rows="4" required><%= post.content %></textarea>
         <button class="button" type="submit">Обновяване на поста</button>

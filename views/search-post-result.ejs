@@ -3,7 +3,7 @@
 <div class="search-results container">
     <h1 class="text-center">Резултати от търсенето на публикации</h1>
 
-    <form action="/search-post" method="POST">
+    <form action="/search-post/<%= channelId %>" method="POST">
         <div class="searchBox">
             <input class="searchInput" type="text" name="searchedItem" placeholder="Търсене на публикация..." required autocomplete="off">
             <button class="searchIconButton" type="submit">
@@ -37,15 +37,16 @@
         <% posts.forEach((post) => { %>
             <div class="channel-card mb-4 text-center">
                 <h2 class="pb-2"><%= post.title %></h2>
-                <p class="text-center">Автор: <a href="/account/<%= post.author_id %>"><%= post.author %></a></p>
+                <p class="text-left"><%= post.content %></p>
+                <p class="text-center">Автор: <a href="/account/<%= post.authorId %>"><%= post.author %></a></p>
 
-                <% if (post.date_of_last_edit) { %>
-                    <small>Редактиран на: <%= post.date_of_last_edit %></small>
+                <% if (post.dateOfLastEdit) { %>
+                    <small>Редактиран на: <%= post.dateOfLastEdit %></small>
                 <% } else { %>
-                    <small>Създаден на: <%= post.date_of_creation %></small>
+                    <small>Създаден на: <%= post.dateOfCreation %></small>
                 <% } %>
 
-                <a href="/view/<%= post.channel_id %>" class="button">Преглед</a>
+                <a href="/view/<%= post.channelId %>" class="button">Преглед</a>
             </div>
         <% }); %>
     <% } else { %>

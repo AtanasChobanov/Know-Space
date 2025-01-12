@@ -1,19 +1,10 @@
 import express from "express";
-import {
-  getLoginPage,
-  getRegisterPage,
-  registerUser,
-  logoutUser,
-  getEditProfilePage,
-  updateProfile,
-  changePassword,
-  getAccount,
-} from "../controllers/authController.js";
+import UserController from "../controllers/authController.js";
 import passport from "passport";
 
 const router = express.Router();
 
-router.get("/login", getLoginPage);
+router.get("/login", UserController.getLoginPage);
 router.post(
   "/login",
   passport.authenticate("local", {
@@ -33,15 +24,15 @@ router.get(
   })
 );
 
-router.get("/register", getRegisterPage);
-router.post("/register", registerUser);
+router.get("/register", UserController.getRegisterPage);
+router.post("/register", UserController.registerController);
 
-router.get("/account/:user_id", getAccount);
+router.get("/account/:userId", UserController.getAccountPage);
 
-router.get("/edit-profile", getEditProfilePage);
-router.post("/edit-profile", updateProfile);
-router.post("/change-password", changePassword);
+router.get("/edit-profile", UserController.getEditProfilePage);
+router.post("/edit-profile", UserController.updateController);
+router.post("/change-password", UserController.changePasswordController);
 
-router.get("/logout", logoutUser);
+router.get("/logout", UserController.logoutController);
 
 export default router;

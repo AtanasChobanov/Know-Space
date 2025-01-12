@@ -87,29 +87,29 @@
   <% if (channels && channels.length > 0) { %> <% channels.forEach((channel) =>
   { %>
   <div class="channel-card mb-4 text-center">
-    <a href="/account/<%= channel.admin_id %>" class="profile-link"
-      ><img src="<%= channel.admin_picture %>" alt="Profile" class="profile"
+    <a href="/account/<%= channel.adminId %>" class="profile-link"
+      ><img src="<%= channel.adminPicture %>" alt="Profile" class="profile"
     /></a>
     <h2 class="pb-2"><%= channel.name %></h2>
     <p>
       Администратор:
-      <a href="/account/<%= channel.admin_id %>"><%= channel.admin %></a>
+      <a href="/account/<%= channel.adminId %>"><%= channel.admin %></a>
     </p>
-    <p>Създадено на: <%= channel.date_of_creation %></p>
+    <p>Създадено на: <%= channel.dateOfCreation %></p>
 
     <% if (!channel.is_member) { %>
     <!-- Показваме бутон "Присъедини се", ако потребителят не е член на канала -->
-    <form action="/join-channel/<%= channel.channel_id %>" method="POST">
+    <form action="/join-channel/<%= channel.channelId %>" method="POST">
       <button type="submit" class="button">Присъедини се</button>
     </form>
     <% } else { %>
     <!-- Показваме бутон "Посети канала", ако потребителят е член на канала -->
-    <a href="/view/<%= channel.channel_id %>" class="button">Посети канала</a>
+    <a href="/view/<%= channel.channelId %>" class="button">Посети канала</a>
 
-    <% if (!(user.user_id === channel.admin_id)) { %>
+    <% if (!(user.userId === channel.adminId)) { %>
     <!-- Показваме бутон "Излез от канала", ако потребителят е член -->
     <form
-      action="/leave-channel/<%= channel.channel_id %>?_method=DELETE"
+      action="/leave-channel/<%= channel.channelId %>?_method=DELETE"
       method="POST"
     >
       <button type="submit" class="button">Излез от канала</button>

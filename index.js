@@ -2,19 +2,12 @@ import express from "express";
 import bodyParser from "body-parser";
 import methodOverride from "method-override";
 import session from "express-session";
-import passport from "passport";
-import { Strategy } from "passport-local";
-import GoogleStrategy from "passport-google-oauth2";
 import flash from "connect-flash";
 import env from "dotenv";
 import channelRoutes from "./routes/channelRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
-import {
-  createNewUser,
-  getUserByEmail,
-  verifyPassword,
-} from "./models/userModel.js";
+import passport from "./config/passport.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -66,79 +59,6 @@ app.use("/", channelRoutes);
 app.use("/", authRoutes);
 
 app.use("/", postRoutes);
-
-// Local passport authentication
-passport.use(
-  "local",
-  new Strategy(async function verify(username, password, cb) {
-    try {
-      const user = await getUserByEmail(username);
-
-      if (!user) {
-        return cb(null, false, { message: "Имейлът не съществува." });
-      }
-
-      const isPasswordCorrect = await verifyPassword(password, user.password);
-
-      if (!isPasswordCorrect) {
-        return cb(null, false, { message: "Грешна парола." });
-      }
-
-      return cb(null, user);
-    } catch (err) {
-      return cb(err);
-    }
-  })
-);
-
-// Google passport authentication
-passport.use(
-  "google",
-  new GoogleStrategy(
-    {
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "https://know-space.onrender.com/auth/google",
-      userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
-      scope: ["profile", "email"],
-    },
-    async function verify(accessToken, refreshToken, profile, cb) {
-      try {
-        const user = await getUserByEmail(profile.email);
-        
-        // Checks if user exists with normal password
-        if(user){
-          if(user.password !== "google") {
-            return cb(null, false, { message: "Имейлът е регистриран чрез парола." });
-          }
-        }
-        else {
-          const newUser = await createNewUser(
-            profile.email,
-            profile.displayName,
-            "google",
-            "Друг",
-            profile.picture
-          );
-
-          return cb(null, newUser);
-        }
-        return cb(null, user);
-      } catch (err) {
-        return cb(err);
-      }
-    }
-  )
-);
-
-// Process users to put in session
-passport.serializeUser((user, cb) => {
-  return cb(null, user);
-});
-
-passport.deserializeUser((user, cb) => {
-  return cb(null, user);
-});
 
 app.listen(port, () => {
   console.log(`Listening on port http://localhost:${port}...`);

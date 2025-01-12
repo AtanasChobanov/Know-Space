@@ -2,7 +2,7 @@
 
 <div class="container">
     <h1>Редактиране на канал</h1>
-    <form action="/<%= channel.channel_id %>/edit?_method=PATCH" method="POST">
+    <form action="/<%= channel.channelId %>/edit?_method=PATCH" method="POST">
         <div class="mb-3">
             <label for="channelName" class="form-label">Име на канала</label>
             <input type="text" class="form-control" id="channelName" name="name" value="<%= channel.name %>" required>

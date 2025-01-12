@@ -1,37 +1,27 @@
 import express from "express";
-import {
-  viewChannels,
-  getNewChannelPage,
-  createChannelController,
-  viewChannelPosts,
-  searchChannelsController,
-  joinChannelController,
-  leaveChannelController,
-  getEditChannelPage,
-  updateChannelConroller,
-  getDeleteChannelPage,
-  deleteChannelConroller,
-} from "../controllers/channelController.js";
+import ChannelController from "../controllers/channelController.js";
 
 const router = express.Router();
 
-// Начална страница за всички канали
-router.get("/", viewChannels);
+router.get("/", ChannelController.viewChannels);
 
-router.get("/view/:channel_id", viewChannelPosts);
+router.get("/view/:channelId", ChannelController.viewChannelPosts);
 
-router.get("/new-channel", getNewChannelPage);
-router.post("/create-channel", createChannelController);
+router.get("/new-channel", ChannelController.getNewChannelPage);
+router.post("/create-channel", ChannelController.createController);
 
-router.post("/search-channel", searchChannelsController);
+router.post(
+  "/search-channel",
+  ChannelController.showSearchedChannelsController
+);
 
-router.post("/join-channel/:channel_id", joinChannelController);
-router.delete("/leave-channel/:channel_id", leaveChannelController);
+router.post("/join-channel/:channelId", ChannelController.joinChannel);
+router.delete("/leave-channel/:channelId", ChannelController.leaveChannel);
 
-router.get("/:channel_id/edit", getEditChannelPage);
-router.patch("/:channel_id/edit", updateChannelConroller);
+router.get("/:channelId/edit", ChannelController.getEditChannelPage);
+router.patch("/:channelId/edit", ChannelController.updateController);
 
-router.get("/:channel_id/delete", getDeleteChannelPage);
-router.delete("/:channel_id/delete", deleteChannelConroller);
+router.get("/:channelId/delete", ChannelController.getDeleteChannelPage);
+router.delete("/:channelId/delete", ChannelController.deleteController);
 
 export default router;

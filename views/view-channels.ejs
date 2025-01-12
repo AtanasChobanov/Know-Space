@@ -87,33 +87,33 @@
   <div class="channel-grid">
     <% channels.forEach(function(channel) { %>
     <div class="channel-card">
-      <a href="/account/<%= channel.admin_id %>" class="profile-link"
-        ><img src="<%= channel.admin_picture %>" alt="Profile" class="profile"
+      <a href="/account/<%= channel.adminId %>" class="profile-link"
+        ><img src="<%= channel.adminPicture %>" alt="Profile" class="profile"
       /></a>
       <% if (locals.infoMessage) { %>
       <h2 class="channel-name"><%= channel.name %></h2>
       <% } else { %>
       <h2 class="channel-name">
-        <a href="/view/<%= channel.channel_id %>"><%= channel.name %></a>
+        <a href="/view/<%= channel.channelId %>"><%= channel.name %></a>
       </h2>
       <% } %>
       <p>
         Администратор:
-        <a href="/account/<%= channel.admin_id %>"><%= channel.admin %></a>
+        <a href="/account/<%= channel.adminId %>"><%= channel.admin %></a>
       </p>
-      <p>Членове: <%= channel.members_count %></p>
-      <small>Създаден на: <%= channel.date_of_creation %></small>
+      <p>Членове: <%= channel.membersCount %></p>
+      <small>Създаден на: <%= channel.dateOfCreation %></small>
 
-      <% if(user.user_id === channel.admin_id || user.user_type ===
+      <% if(user.userId === channel.adminId || user.userType ===
       "Администратор") { %>
       <div class="mt-2 btn-grop">
-        <a href="/<%= channel.channel_id %>/edit" class="button">Редактиране</a>
-        <a href="/<%= channel.channel_id %>/delete" class="button delete-button"
+        <a href="/<%= channel.channelId %>/edit" class="button">Редактиране</a>
+        <a href="/<%= channel.channelId %>/delete" class="button delete-button"
           >Изтриване</a
         >
       </div>
       <% } else if (locals.infoMessage) { %>
-      <form action="/join-channel/<%= channel.channel_id %>" method="POST">
+      <form action="/join-channel/<%= channel.channelId %>" method="POST">
         <div class="mt-2 btn-grop leave-channel">
           <button type="submit" class="button">Присъедини се</button>
         </div>
@@ -121,7 +121,7 @@
       <% } else {%>
       <!-- Показваме бутон "Излез от канала", ако потребителят е член -->
       <form
-        action="/leave-channel/<%= channel.channel_id %>?_method=DELETE"
+        action="/leave-channel/<%= channel.channelId %>?_method=DELETE"
         method="POST"
       >
         <div class="mt-2 btn-grop leave-channel">
