@@ -49,14 +49,14 @@
         </form>
         <% if (posts && posts.length > 0) { %>
             <% posts.forEach((post) => { %>
-                <div class="channel-card mb-4 text-center" data-title="<%= post.title %>">
-                    <h2 class="pb-2 text-center"><%= post.title %></h2>
+                <div class="channel-card mb-4" data-title="<%= post.title %>">
+                    <h2 class="pb-2 text-left"><%= post.title %></h2>
                     <p class="text-left"><%= post.content %></p>
-                    <p class="text-center">Автор: <a href="/account/<%= post.authorId %>"><%= post.author %></a></p>
+                    <p class="text-left">Автор: <a href="/account/<%= post.authorId %>"><%= post.author %></a></p>
                     <% if (post.dateOfLastEdit) { %>
-                        <small class="text-center">Редактиран на: <%= post.dateOfLastEdit %></small>
+                        <small>Редактиран на: <%= post.dateOfLastEdit %></small>
                     <% } else { %>
-                        <small class="text-center">Създаден на: <%= post.dateOfCreation %></small>
+                        <small>Създаден на: <%= post.dateOfCreation %></small>
                     <% } %>
 
                     <% if(user.userId === post.authorId  || user.userType === "Администратор") { %>
