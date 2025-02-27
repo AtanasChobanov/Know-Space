@@ -8,24 +8,35 @@ class ChannelController {
         const userChannels = await Channel.getUserChannels(req.user.userId);
 
         if (userChannels.length === 0) {
-          const recentChannels = await Channel.getRecentChannels();
-          return res.render("view-channels.ejs", {
-            channels: recentChannels,
-            infoMessage:
-              "Не сте член на нито един канал. Ето някои от най-новите канали, които можете да разгледате.",
-          });
+          return res.redirect("/explore");
         }
         res.render("view-channels.ejs", {
           channels: userChannels,
         });
       } catch (err) {
         res.status(500).render("error-message.ejs", {
-          errorMessage:
-            "Възникна проблем при зареждането на каналите. Опитайте отново.",
+          errorMessage: "Грешка при зареждане на каналите.",
         });
       }
     } else {
-      res.render("home.ejs");
+      res.redirect("/login");
+    }
+  }
+
+  static async exploreChannelsController(req, res) {
+    if (req.isAuthenticated()) {
+      try {
+        const recentChannels = await Channel.getRecentChannels(req.user.userId);
+        return res.render("explore.ejs", {
+          channels: recentChannels,
+        });
+      } catch (err) {
+        res.status(500).render("error-message.ejs", {
+          errorMessage: "Грешка при зареждане на каналите.",
+        });
+      }
+    } else {
+      res.redirect("/login");
     }
   }
 

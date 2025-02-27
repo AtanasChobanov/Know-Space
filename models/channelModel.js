@@ -106,7 +106,7 @@ class Channel {
   }
 
   // READ recent channels when user isn't member of any channel
-  static async getRecentChannels(limit = 8) {
+  static async getRecentChannels(userId, limit = 15) {
     try {
       const query = `
           SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
@@ -119,15 +119,20 @@ class Channel {
           `;
       const result = await db.query(query, [limit]);
 
-      return result.rows.map((channel) => new Channel(
-        channel.channel_id,
-        channel.name,
-        channel.date_of_creation,
-        channel.admin_id,
-        channel.admin,
-        channel.admin_picture,
-        channel.members_count
-      ));
+      const channels = await Promise.all(result.rows.map(async (channel) => {
+        let c = new Channel(
+          channel.channel_id,
+          channel.name,
+          channel.date_of_creation,
+          channel.admin_id,
+          channel.admin,
+          channel.admin_picture,
+          channel.members_count,
+        );
+        c.isUserMember = await c.isUserMember(userId);
+        return c;
+      }));
+      return channels;
     } catch (err) {
       console.error("Error fetching recent channels:", err);
       throw err;
@@ -183,26 +188,30 @@ class Channel {
   static async searchChannels(searchedItem, userId) {
     try {
       const result = await db.query(
-        `SELECT channel_id, ch.name, date_of_creation, admin_id, 
-        u.profile_picture AS admin_picture, u.username AS admin
+        `SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, 
+          u.profile_picture AS admin_picture, u.username AS admin,
+          COUNT(moc.user_id) AS members_count
         FROM channels ch
         JOIN users u ON ch.admin_id = u.user_id
-        WHERE ch.name ILIKE '%' || $1 || '%';`,
+        LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
+        WHERE ch.name ILIKE '%' || $1 || '%'
+        GROUP BY ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.profile_picture, u.username;`,
         [searchedItem]
       );
 
-      const channels = result.rows.map((channel) => new Channel(
-        channel.channel_id,
-        channel.name,
-        channel.date_of_creation,
-        channel.admin_id,
-        channel.admin,
-        channel.admin_picture,
-      ));
-
-      for (let channel of channels) {
-        channel.is_member = await channel.isUserMember(userId);
-      }
+      const channels = await Promise.all(result.rows.map(async (channel) => {
+        let c = new Channel(
+          channel.channel_id,
+          channel.name,
+          channel.date_of_creation,
+          channel.admin_id,
+          channel.admin,
+          channel.admin_picture,
+          channel.members_count,
+        );
+        c.isUserMember = await c.isUserMember(userId);
+        return c;
+      }));
       return channels;
     } catch (err) {
       console.error("Error searching channels:", err);

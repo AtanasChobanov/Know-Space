@@ -1,7 +1,29 @@
 import Post from "../models/postModel.js";
 import Channel from "../models/channelModel.js";
+import Vote from "../models/voteModel.js";
+import User from "../models/userModel.js";
 
 class PostController {
+  static async getFeedController(req, res) {
+    if (req.isAuthenticated()) {
+      try {
+        const posts = await Post.getFromUserChannels(req.user.userId);
+
+        if (posts.length === 0) {
+          return res.redirect("/channels");
+        }
+        res.render("feed.ejs", { posts });
+      } catch (err) {
+        res.status(500).render("error-message.ejs", {
+          errorMessage: "Грешка при зареждане на публикациите.",
+        });
+      }
+    } else {
+      const userCount = await User.getTotalUsers();
+      res.render("home.ejs", { userCount });
+    }
+  }
+
   static async getNewPostPage(req, res) {
     if (req.isAuthenticated()) {
       try {
@@ -18,11 +40,9 @@ class PostController {
           channelId: channel.channelId,
         });
       } catch (err) {
-        res
-          .status(404)
-          .render("error-message.ejs", {
-            errorMessage: "Каналът не съществува",
-          });
+        res.status(404).render("error-message.ejs", {
+          errorMessage: "Каналът не съществува",
+        });
       }
     } else {
       res.redirect("/login");
@@ -32,15 +52,30 @@ class PostController {
   static async createController(req, res) {
     if (req.isAuthenticated()) {
       try {
-        const post = await Post.create(
+        if (req.files.images && req.files.images.length > 5) {
+          return res.status(400).render("new-post.ejs", {
+            errorMessage: "Не може да се качват повече от 5 снимки.",
+            title: req.body.title,
+            content: req.body.content,
+            channelId: req.params.channelId,
+          });
+        }
+
+        const files = [
+          ...(req.files.images || []),
+          ...(req.files.documents || []),
+        ];
+        await Post.create(
           req.body.title,
           req.body.content,
           req.user.userId,
-          req.params.channelId
+          req.params.channelId,
+          files
         );
 
         res.redirect(`/view/${req.params.channelId}`);
       } catch (err) {
+        console.error(err);
         res.status(500).render("error-message.ejs", {
           errorMessage: "Грешка при създаване на пост.",
         });
@@ -50,11 +85,42 @@ class PostController {
     }
   }
 
+  static async voteController(req, res) {
+    try {
+      const voteType = req.body.voteType;
+      if (!Vote.VALID_VOTE_TYPES.includes(voteType)) {
+        return res.status(400).json({ error: "Invalid vote type" });
+      }
+      const post = await Post.getById(req.params.postId);
+      const result = await post.vote(req.user.userId, voteType);
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: "Error processing vote" });
+    }
+  }
+
+  static async getPostVotesController(req, res) {
+    try {
+      const post = await Post.getById(req.params.postId);
+      const votes = await post.getVotes(req.user.userId);
+      res.json(votes);
+    } catch (err) {
+      res.status(500).json({ error: "Error fetching votes" });
+    }
+  }
+
   static async showSearchedPostsController(req, res) {
     if (req.isAuthenticated()) {
       try {
-        const posts = await Post.search(req.body.searchedItem, req.params.channelId);
-        res.render("search-post-result.ejs", { posts, channelId: req.params.channelId });
+        const posts = await Post.search(
+          req.body.searchedItem,
+          req.params.channelId
+        );
+        const channel = await Channel.getById(req.params.channelId);
+        res.render("search-post-result.ejs", {
+          posts,
+          channel,
+        });
       } catch (err) {
         res.status(500).render("error-message.ejs", { errorMessage: err });
       }
@@ -67,6 +133,7 @@ class PostController {
     if (req.isAuthenticated()) {
       try {
         const post = await Post.getById(req.params.postId);
+        await post.getFiles();
 
         if (
           req.user.userId === post.authorId ||
@@ -93,12 +160,20 @@ class PostController {
     if (req.isAuthenticated()) {
       try {
         const post = await Post.getById(req.params.postId);
-
         if (
           req.user.userId === post.authorId ||
           req.user.userType === "Администратор"
         ) {
-          await post.update(req.body.title, req.body.content);
+          const newFiles = [
+            ...(req.files.images || []),
+            ...(req.files.documents || []),
+          ];
+          await post.update(
+            req.body.title,
+            req.body.content,
+            req.body.deletedFiles,
+            newFiles
+          );
           res.redirect(`/view/${req.params.channelId}`);
         } else {
           return res.redirect("/");

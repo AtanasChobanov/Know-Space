@@ -11,6 +11,16 @@ const defaultAvatars = [
 ];
 
 class User {
+  static async getTotalUsers() {
+    try {
+      const result = await db.query('SELECT COUNT(*) as count FROM users');
+      return parseInt(result.rows[0].count);
+    } catch (err) {
+      console.error('Error counting users:', err);
+      throw err;
+    }
+  }
+
   constructor(
     userId,
     email,
@@ -31,7 +41,11 @@ class User {
 
   async getPosts() {
     const result = await db.query(
-      "SELECT post_id, title, content, date_of_creation, date_of_last_edit FROM posts WHERE author_id = $1 ORDER BY date_of_creation DESC;",
+      `SELECT p.post_id, p.title, p.content, p.channel_id, p.date_of_creation, p.date_of_last_edit, ch.name AS channel_name 
+       FROM posts p 
+       JOIN channels ch ON p.channel_id = ch.channel_id 
+       WHERE p.author_id = $1 
+       ORDER BY p.date_of_creation DESC;`,
       [this.userId]
     );
 
@@ -42,10 +56,12 @@ class User {
             post.title,
             post.content,
             this.userId,
-            null,
+            post.channel_id,
             post.date_of_creation,
             post.date_of_last_edit,
-            this.username
+            this.username,
+            null,
+            post.channel_name
           )
       );
   }

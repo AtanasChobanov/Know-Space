@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS posts
 (
     post_id SERIAL PRIMARY KEY,
     title character varying(100) NOT NULL,
-    content character varying(2000) NOT NULL,
+    content character varying(5000) NOT NULL,
     author_id integer NOT NULL,
     date_of_creation timestamp DEFAULT CURRENT_TIMESTAMP,
     date_of_last_edit timestamp ,
@@ -51,6 +51,36 @@ CREATE TABLE IF NOT EXISTS posts
         ON DELETE CASCADE,
     CONSTRAINT fk_posts_users FOREIGN KEY (author_id)
         REFERENCES users (user_id) MATCH SIMPLE
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS post_files (
+    file_id SERIAL PRIMARY KEY,           
+    post_id INTEGER NOT NULL,             
+    url TEXT NOT NULL,               
+    type VARCHAR(50) NOT NULL,       
+    upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_post_files_posts 
+        FOREIGN KEY (post_id)
+        REFERENCES posts (post_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS post_votes (
+    user_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
+    vote_type SMALLINT CHECK (vote_type IN (-1, 1)), -- -1 за downvote, 1 за upvote
+    PRIMARY KEY (user_id, post_id),
+    CONSTRAINT fk_votes_users 
+        FOREIGN KEY (user_id) 
+        REFERENCES users (user_id) 
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_votes_posts 
+        FOREIGN KEY (post_id) 
+        REFERENCES posts (post_id) 
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );

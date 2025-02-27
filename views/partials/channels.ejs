@@ -1,0 +1,44 @@
+<% if (channels && channels.length > 0) { %>
+    <div class="channel-grid">
+      <% channels.forEach(function(channel) { %>
+        <div class="channel-card">
+          <a href="/account/<%= channel.adminId %>" class="profile-link">
+            <img src="<%= channel.adminPicture %>" alt="Profile" class="profile" />
+          </a>
+          <h3 class="channel-name">
+            <% if (channel.isUserMember) { %>
+              <a href="/view/<%= channel.channelId %>"><%= channel.name %></a>
+            <% } else { %>
+              <%= channel.name %>
+            <% } %>
+          </h3>
+          <p>
+            Администратор:
+            <a href="/account/<%= channel.adminId %>"><%= channel.admin %></a>
+          </p>
+          <p>Членове: <%= channel.membersCount %></p>
+          <small>Създаден на: <%= channel.dateOfCreation %></small>
+          <% if (user.userId === channel.adminId || user.userType === "Администратор") { %>
+            <div class="btn-grop">
+              <a href="/<%= channel.channelId %>/edit" class="button">Редактиране</a>
+              <a href="/<%= channel.channelId %>/delete" class="button delete-button">Изтриване</a>
+            </div>
+          <% } else if (channel.isUserMember) { %>
+            <form action="/leave-channel/<%= channel.channelId %>?_method=DELETE" method="POST">
+              <div class="btn-grop leave-channel">
+                <button type="submit" class="exit-button">Излез от канала</button>
+              </div>
+            </form>
+          <% } else { %>
+            <form action="/join-channel/<%= channel.channelId %>" method="POST">
+              <div class="btn-grop leave-channel">
+                <button type="submit" class="button">Присъедини се</button>
+              </div>
+            </form>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
+  <% } else { %>
+    <p>Няма налични канали.</p>
+  <% } %>

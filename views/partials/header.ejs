@@ -1,69 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="/styles/main.css" />
-    <link rel="icon" href="/images/small-icon.png" type="image/png" />
 
-    <title>KnowSpace</title>
-  </head>
-  <body>
-    <!-- Хедър с класове от Bootstrap -->
-    <header class="header p-3 mb-3 border-bottom">
-      <div class="container">
-        <div
-          class="d-flex flex-wrap justify-content-center justify-content-lg-start"
-        >
-          <a
-            href="/"
-            class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none"
-          >
-            <img
-              src="/images/KnowSpace 1-1.png"
-              alt="KnowSpace logo"
-              class="header-image"
-            />
-          </a>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-          <!-- Навигация с бутоните -->
-          <ul class="nav col-12 col-lg-auto ms-lg-auto mb-2 mb-md-0">
-            <li>
-              <button onclick="window.location.href='/'" class="header-button">
-                Начало
-              </button>
-            </li>
-            <li>
-              <button
-                onclick="window.location.href='/new-channel'"
-                class="header-button create-channel-button"
-              >
-                Създай нов канал
-              </button>
-            </li>
-            <li>
-              <button
-                onclick="window.location.href='/logout'"
-                class="header-button login-button"
-              >
-                Изход
-              </button>
-            </li>
-          </ul>
+  <link rel="stylesheet" href="/styles/channels.css">
+  <link rel="stylesheet" href="/styles/new-post.css">
+  <link rel="stylesheet" href="/styles/main.css" />
+  <link rel="stylesheet" href="/styles/side-bar.css" />
+  <link rel="stylesheet" href="/styles/footer.css">
+  <link rel="icon" href="/images/small-icon.png" type="image/png" />
+  <title>KnowSpace</title>
+</head>
 
-          <a href="/account/<%= user.userId %>" class="profile-link">
-            <img
-              src="<%= user.profilePicture %>"
-              alt="Profile"
-              class="profile"
-            />
-          </a>
-        </div>
-      </div>
-    </header>
+<body>
+  <!-- Хедър с класове от Bootstrap -->
+  <header class="header p-3 mb-3 border-bottom">
+    <div class="container">
+      <div class="d-flex flex-wrap justify-content-between align-items-center">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-dark text-decoration-none">
+            <img src="/images/KnowSpace 1-1.png" alt="KnowSpace logo" class="header-image" />
+        </a>
+    
+        <a href="/account/<%= user.userId %>" class="profile-link d-flex align-items-center">
+            <span class="header-text"><%= user.username %></span>
+            <img src="<%= user.profilePicture %>" alt="Profile" class="profile" />
+        </a>
+    </div>
+    </div>
+  </header>
+
+  <%- include("side-bar.ejs") %>
 
     <main>
