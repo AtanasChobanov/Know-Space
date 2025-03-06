@@ -2,6 +2,7 @@ import db from "../config/db.js";
 import PostFilesManager from "./postFilesManagerModel.js";
 import { sanitizeHTML } from "../config/sanitize.js";
 import Vote from "./voteModel.js";
+import { fetchWikipediaArticles } from "../config/wikipedia.js";
 
 class Post extends PostFilesManager {
   constructor(
@@ -121,7 +122,6 @@ class Post extends PostFilesManager {
   static async #fetchPosts(query, params) {
     try {
       const result = await db.query(query, params);
-
       const posts = result.rows.map(
         (post) =>
           new Post(
@@ -137,12 +137,8 @@ class Post extends PostFilesManager {
             post.channel_name
           )
       );
-
-      // Load files for each post
-      for (const post of posts) {
-        await post.getFiles();
-      }
-
+      
+      await Promise.all(posts.map((post) => post.getFiles()));
       return posts;
     } catch (err) {
       console.error("Error fetching posts:", err);
@@ -159,7 +155,7 @@ class Post extends PostFilesManager {
          JOIN users u ON p.author_id = u.user_id
          JOIN members_of_channels mc ON ch.channel_id = mc.channel_id
          WHERE mc.user_id = $1
-         ORDER BY p.date_of_creation DESC;`;
+         ORDER BY GREATEST(p.date_of_creation, COALESCE(p.date_of_last_edit, p.date_of_creation)) DESC;`;
     return Post.#fetchPosts(query, [userId]);
   }
 
@@ -173,7 +169,7 @@ class Post extends PostFilesManager {
          JOIN users u 
          ON p.author_id = u.user_id 
          WHERE ch.channel_id = $1 
-         ORDER BY date_of_creation DESC;`;
+         ORDER BY GREATEST(p.date_of_creation, COALESCE(p.date_of_last_edit, p.date_of_creation)) DESC;`;
     return Post.#fetchPosts(query, [channelId]);
   }
 
@@ -217,6 +213,34 @@ class Post extends PostFilesManager {
        JOIN channels ch ON p.channel_id = ch.channel_id
        WHERE p.title ILIKE '%' || $1 || '%' AND p.channel_id = $2;`;
     return Post.#fetchPosts(query, [searchedItem, channelId]);
+  }
+
+  // Search in Wikipedia when no channels are found
+  static async searchWikipedia(searchedItem) {
+    try {
+      const response = await fetchWikipediaArticles(searchedItem);
+      // Използваме Promise.all(), за да изчакаме всички асинхронни заявки
+      const posts = await Promise.all(response.map(async (item) => {
+          const post = new Post(
+            item.postId,
+            item.title,
+            item.content,
+            item.authorId,
+            null,
+            new Date(),
+            null,
+            item.authorName,
+            item.authorPicture
+          );
+          await post.getWikipediaImages(item.title);
+          return post;
+        })
+      );
+      return posts;
+    } catch (err) {
+      console.error("Error searching Wikipedia:", err);
+      throw err;
+    }
   }
 
   // READ a specific post by ID

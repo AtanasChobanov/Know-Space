@@ -2,6 +2,7 @@ import cloudinary  from "../config/cloudinary.js";
 import fs from "fs/promises";
 import File from "./fileModel.js";
 import db from "../config/db.js";
+import { fetchWikipediaImages } from "../config/wikipedia.js";
 
 class PostFilesManager {
   constructor(postId) {
@@ -97,6 +98,19 @@ class PostFilesManager {
     } catch (err) {
       console.error("Error fetching files for post:", err);
       throw err;
+    }
+  }
+
+  // Get up to 5 images from Wikipedia API
+  async getWikipediaImages(pageTitle) {
+    try {
+      const validImages = await fetchWikipediaImages(pageTitle);
+      this.uploadedFiles = validImages.map(
+        (image) => new File("wiki", this.postId, image, "image", new Date())
+      );
+    } catch (err) {
+      console.error("Error fetching Wikipedia images:", err);
+      return [];
     }
   }
 }

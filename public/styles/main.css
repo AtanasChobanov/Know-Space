@@ -9,6 +9,13 @@
 .post {
     word-wrap: break-word;
     overflow: hidden;
+    width: 100%;
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 html, body {
@@ -25,6 +32,7 @@ main {
     height: calc(100vh - 100px);
     overflow-y: auto;
     flex: 1;
+    padding-bottom: 70px;
 }
 
 header {
@@ -57,13 +65,9 @@ header {
 }
 
 h1 {
-    margin-bottom: 20px;
+    margin: 20px;
     text-align: center;
-}
-
-.channel-name>h1 {
-    text-align: start;
-    margin-left: 1rem;
+    color: #007bff;
 }
 
 .nav-link {
@@ -120,6 +124,7 @@ a {
 img {
     max-width: 100%;
     height: auto;
+    border-radius: 10px;
 }
 
 .button,
@@ -173,6 +178,10 @@ img {
     transform: scale(0.9);
 }
 
+.new-post-btn {
+    width: 100%;
+}
+
 .btn-grop {
     display: flex;
     flex-direction: column;
@@ -224,6 +233,211 @@ img {
     margin-bottom: 20px;
 }
 
+.new-post-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 10px;
+}
+
+#toolbar {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+}
+
+.toolbar-button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.toolbar-button:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+.toolbar-button:active {
+    transform: scale(0.95);
+}
+
+.font-selector {
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.font-selector:hover {
+    border-color: #007bff;
+}
+
+#title {
+    width: 97%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    outline: none;
+}
+
+#editor {
+    width: 97%;
+    padding: 10px;
+    min-height: 200px;
+    font-size: 16px;
+    line-height: 1.6;
+    outline: none;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    background: white;
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
+
+.upload-section {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    border-radius: 12px;
+}
+
+.file-container {
+    width: 48%;
+    height: 200px;
+    border: 2px dashed #007bff;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+}
+
+.file-container.with-file {
+    border-style: solid;
+}
+
+.file-trigger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.file-trigger svg {
+    stroke: #007bff;
+    transition: stroke 0.3s ease;
+}
+
+.file-trigger .text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #007bff;
+    transition: color 0.3s ease;
+}
+
+.file-container:hover {
+    border-color: #0056b3;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.file-container:hover .file-trigger svg {
+    stroke: #0056b3;
+}
+
+.file-container:hover .file-trigger .text {
+    color: #0056b3;
+}
+
+.error-message {
+    color: red;
+    font-size: 18px;
+    margin: 20px auto;
+    padding: 15px;
+    text-align: center;
+    display: none;
+    background-color: rgba(255, 0, 0, 0.1);
+    border-radius: 12px;
+    width: 80%;
+}
+
+.uploaded-files {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-top: 1px solid #ddd;
+    border-radius: 12px;
+}
+
+.uploaded-files h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #007bff;
+}
+
+.uploaded-files .file-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.uploaded-files .file-item {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.uploaded-files .file-item img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.uploaded-files .file-item .remove-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+}
+
 .search-button {
     position: relative;
     display: inline-block;
@@ -244,13 +458,15 @@ img {
 .search-container {
     display: flex;
     justify-content: center;
+    width: 100%;
+    margin: 0 auto;
     padding: 20px;
     background-color: transparent;
 }
 
 .search-form {
-    width: 100%;
-    max-width: 600px;
+    width: 650px;
+    margin: 0 auto;
 }
 
 .searchBox {
@@ -263,7 +479,8 @@ img {
     border: 2px solid #000;
     position: relative;
     width: 100%;
-    padding-right: 50px;
+    padding-right: 90px;
+    height: 60px;
 }
 
 .searchInput {
@@ -272,8 +489,8 @@ img {
     background: none;
     outline: none;
     color: black;
-    font-size: 15px;
-    padding: 12px 20px;
+    font-size: 18px;
+    padding: 16px 24px;
     padding-right: 40px;
 }
 
@@ -283,8 +500,8 @@ img {
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 35px;
-    height: 35px;
+    width: 45px;
+    height: 45px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -295,8 +512,8 @@ img {
 }
 
 .searchIconButton svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .searchIconButton:hover {
@@ -492,9 +709,99 @@ button:active {
     background-color: rgba(var(--cardsquares), .85);
 }
 
+.channel-card {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    background: #fff;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 20px auto;
+    padding: 20px;
+}
+
+.channel-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+.channel-card__content {
+    text-align: center;
+    opacity: 1;
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.channel-card__title {
+    margin: 0;
+    font-size: 28px;
+    color: #007bff;
+    font-weight: 700;
+}
+
+.channel-card__description {
+    margin: 10px 0 0;
+    font-size: 16px;
+    color: #555;
+    line-height: 1.6;
+}
+
+.channel-card .profile {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    margin-bottom: 20px;
+    order: 1;
+}
+
+.channel-card .channel-name {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+    order: 2;
+}
+
+.channel-card p {
+    font-size: 16px;
+    color: #555;
+    margin: 5px 0;
+    order: 3;
+}
+
+.channel-card small {
+    font-size: 14px;
+    color: #777;
+    order: 4;
+}
+
+.channel-card .btn-grop {
+    margin-top: 20px;
+    order: 5;
+}
+
+.channel-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
 .posts-container {
     margin: 20px auto;
-    max-width: 680px;
+    max-width: 650px;
     padding: 0 15px;
     width: 100%;
 }
@@ -531,7 +838,6 @@ button:active {
     font-size: 1rem;
     text-align: left;
     flex-grow: 1;
-    /* Allows the content to expand */
 }
 
 .post-actions {
@@ -611,10 +917,23 @@ button:active {
 }
 
 .post-images {
-    margin: 20px auto;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.post-images img {
     width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post-images img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .post-images.single {
@@ -715,6 +1034,102 @@ button:active {
     background-color: #e4e6e9;
 }
 
+.post-content {
+    margin: 15px 0;
+    line-height: 1.6;
+    color: #333;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 700px;
+    height: 700px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    align-items: center;
+    position: relative;
+}
+
+.modal-image {
+    width: 700px;
+    height: 700px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: red;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.post-file {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    background-color: #f9f9f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    color: #007bff;
+    text-align: center;
+    padding: 10px;
+}
+
+.post-file iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.post-images {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.post-images img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post-images img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .post-actions {
     display: flex;
     justify-content: flex-end;
@@ -787,7 +1202,6 @@ button:active {
     display: block;
     padding: 12px 16px;
     text-decoration: none;
-    color: black;
     font-size: 16px;
     transition: background-color 0.3s, color 0.3s;
 }
@@ -825,12 +1239,11 @@ button:active {
     background-color: #f0f2f5;
 }
 
-
-
 .vote-container {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
 }
 
 .volt-button {
@@ -869,14 +1282,6 @@ button:active {
     fill: white;
     width: 24px;
     height: 24px;
-}
-
-.search-form {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-    width: 650px;
 }
 
 @media (max-width: 992px) {
@@ -929,13 +1334,38 @@ button:active {
         padding: 0.8em;
     }
 
-    .post-images.multiple {
+    .post-images {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .post-images img {
+        height: 150px;
+    }
+
+    .post-images.multiple {
+        grid-template-columns: 1fr;
+    }
+
+    .post-images.multiple .main-image {
+        grid-column: 1;
+        grid-row: 1;
+        height: 200px;
+    }
+
+    .post-images.multiple .secondary-images {
+        grid-column: 1;
+        grid-row: 2;
+        flex-direction: row;
+    }
+
+    .post-images.multiple .secondary-images .image-container {
+        height: 100px;
     }
 
     .posts-container li {
-        padding: 12px;
-        margin: 15px 0;
+        padding: 10px;
+        margin: 10px 0;
     }
 
     .post-header {
@@ -957,8 +1387,8 @@ button:active {
     }
 
     .card-info span {
-        height: 100px;
-        width: 100px;
+        height: 80px;
+        width: 80px;
     }
 
     .searchBox {
@@ -972,8 +1402,8 @@ button:active {
     }
 
     .posts-container li {
-        padding: 10px;
-        margin: 10px 0;
+        padding: 8px;
+        margin: 8px 0;
     }
 
     .post-header {
@@ -994,6 +1424,56 @@ button:active {
         right: 10px;
         top: 10px;
         padding-left: 250px;
+    }
+
+    .channel-card {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .channel-card__title {
+        font-size: 24px;
+    }
+
+    .channel-card__description {
+        font-size: 14px;
+    }
+
+    .channel-card .profile {
+        width: 60px;
+        height: 60px;
+        order: 1;
+    }
+
+    .channel-card .channel-name {
+        font-size: 18px;
+        order: 2;
+    }
+
+    .channel-card p {
+        font-size: 14px;
+        order: 3;
+    }
+
+    .channel-card small {
+        font-size: 12px;
+        order: 4;
+    }
+
+    .channel-card .btn-grop {
+        order: 5;
+    }
+
+    .post-images {
+        grid-template-columns: 1fr;
+    }
+
+    .post-images.multiple .main-image {
+        height: 150px;
+    }
+
+    .post-images.multiple .secondary-images .image-container {
+        height: 80px;
     }
 }
 
@@ -1027,7 +1507,7 @@ button:active {
 
     .channel-grid {
         grid-template-columns: 1fr;
-        gap: 15px;
+        gap: 10px;
     }
 
     .search-form {
@@ -1048,8 +1528,8 @@ button:active {
     }
 
     .posts-container li {
-        margin: 20px 0;
-        padding: 8px;
+        margin: 10px 0;
+        padding: 6px;
     }
 
     .post-header {
@@ -1062,42 +1542,60 @@ button:active {
     }
 
     .post-images.single img {
-        max-height: 300px;
+        max-height: 200px;
     }
 
     .post-images.multiple .main-image {
-        height: 200px;
+        height: 120px;
     }
 
     .post-images.multiple .secondary-images .image-container {
-        height: 100px;
+        height: 60px;
     }
 
     .profile-picture-small {
-        width: 40px;
-        height: 40px;
+        width: 30px;
+        height: 30px;
     }
 }
 
-@media (max-width: 400px) {
-    main {
-        margin-top: 180px;
+@media (max-width: 480px) {
+    .channel-card {
+        max-width: 300px;
+        padding: 10px;
     }
 
-    .card-info h3 {
-        font-size: 1.2em;
+    .channel-card__title {
+        font-size: 18px;
     }
 
-    .card-info p {
-        font-size: 1em;
+    .channel-card__description {
+        font-size: 12px;
     }
 
-    .posts-container h3 {
-        font-size: 1.5em;
+    .channel-card .profile {
+        width: 50px;
+        height: 50px;
+        order: 1;
     }
 
-    .header-image {
-        width: 100px;
+    .channel-card .channel-name {
+        font-size: 16px;
+        order: 2;
+    }
+
+    .channel-card p {
+        font-size: 12px;
+        order: 3;
+    }
+
+    .channel-card small {
+        font-size: 10px;
+        order: 4;
+    }
+
+    .channel-card .btn-grop {
+        order: 5;
     }
 
     .post-images.multiple .secondary-images {
@@ -1105,7 +1603,7 @@ button:active {
     }
 
     .post-images.multiple .secondary-images .image-container {
-        height: 150px;
+        height: 80px;
     }
 
     .post-images.multiple .secondary-images .image-container:first-child img {
@@ -1117,7 +1615,71 @@ button:active {
     }
 
     .post-content {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 412px) {
+    .posts-container {
+        max-width: 350px;
+    }
+
+    .post-card {
+        max-width: 350px;
+    }
+
+    .post-images.single img {
+        max-height: 180px;
+    }
+
+    .post-images.multiple .main-image {
+        height: 100px;
+    }
+
+    .post-images.multiple .secondary-images .image-container {
+        height: 50px;
+    }
+
+    .post-content {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 400px) {
+    main {
+        margin-top: 180px;
+    }
+
+    .card-info h3 {
+        font-size: 1.1em;
+    }
+
+    .card-info p {
+        font-size: 0.9em;
+    }
+
+    .posts-container h3 {
+        font-size: 1.3em;
+    }
+
+    .header-image {
+        width: 80px;
+    }
+
+    .post-images.multiple .secondary-images .image-container {
+        height: 60px;
+    }
+
+    .post-images.multiple .secondary-images .image-container:first-child img {
+        border-radius: 0;
+    }
+
+    .post-images.multiple .secondary-images .image-container:last-child img {
+        border-radius: 0 0 8px 8px;
+    }
+
+    .post-content {
+        font-size: 0.8rem;
     }
 }
 

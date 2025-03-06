@@ -112,10 +112,14 @@ class PostController {
   static async showSearchedPostsController(req, res) {
     if (req.isAuthenticated()) {
       try {
-        const posts = await Post.search(
+        let posts = await Post.search(
           req.body.searchedItem,
           req.params.channelId
         );
+        // Use Wikipedia API
+        if (posts.length === 0) {
+          posts = await Post.searchWikipedia(req.body.searchedItem);
+        }
         const channel = await Channel.getById(req.params.channelId);
         res.render("search-post-result.ejs", {
           posts,

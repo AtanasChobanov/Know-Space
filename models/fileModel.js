@@ -25,6 +25,7 @@ class File {
     return urlParts[urlParts.indexOf("upload") - 1];
   }
 
+  // Функция за изтриване на файл
   async deleteFromCloudinary() {
     try {
       const result = await cloudinary.uploader.destroy(this.#extractPublicId(), { resource_type: this.#extractResourseType() });

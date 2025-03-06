@@ -45,25 +45,27 @@ class User {
        FROM posts p 
        JOIN channels ch ON p.channel_id = ch.channel_id 
        WHERE p.author_id = $1 
-       ORDER BY p.date_of_creation DESC;`,
+       ORDER BY GREATEST(p.date_of_creation, COALESCE(p.date_of_last_edit, p.date_of_creation)) DESC;`,
       [this.userId]
     );
 
-    return result.rows.map(
-        (post) =>
-          new Post(
-            post.post_id,
-            post.title,
-            post.content,
-            this.userId,
-            post.channel_id,
-            post.date_of_creation,
-            post.date_of_last_edit,
-            this.username,
-            null,
-            post.channel_name
-          )
-      );
+    const posts = result.rows.map(
+      (post) =>
+        new Post(
+          post.post_id,
+          post.title,
+          post.content,
+          this.userId,
+          post.channel_id,
+          post.date_of_creation,
+          post.date_of_last_edit,
+          this.username,
+          null,
+          post.channel_name
+        )
+    );
+    await Promise.all(posts.map((post) => post.getFiles()));
+    return posts;
   }
 
   async update(username, bio) {
