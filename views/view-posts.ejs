@@ -1,15 +1,15 @@
-<%- include("partials/header.ejs") %>
+<%- include("partials/header") %>
 
 <div class="container">
     <% if (channel) { %>
         <div class="channel-name">
             <h1><%= channel.name %></h1>
         </div>
-        <%- include("partials/search-bar-posts.ejs") %>
-        <%- include("partials/posts.ejs") %>
+        <%- include("partials/search-bar-posts") %>
+        <%- include("partials/posts") %>
     <% } else { %>
         <p>Този канал не съществува.</p>
     <% } %>
 </div>
 
-<%- include("partials/footer.ejs") %>
+<%- include("partials/footer") %>

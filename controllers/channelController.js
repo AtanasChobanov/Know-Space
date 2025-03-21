@@ -10,11 +10,11 @@ class ChannelController {
         if (userChannels.length === 0) {
           return res.redirect("/explore");
         }
-        res.render("view-channels.ejs", {
+        res.render("view-channels", {
           channels: userChannels,
         });
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Грешка при зареждане на каналите.",
         });
       }
@@ -27,11 +27,11 @@ class ChannelController {
     if (req.isAuthenticated()) {
       try {
         const recentChannels = await Channel.getRecentChannels(req.user.userId);
-        return res.render("explore.ejs", {
+        return res.render("explore", {
           channels: recentChannels,
         });
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Грешка при зареждане на каналите.",
         });
       }
@@ -42,7 +42,7 @@ class ChannelController {
 
   static getNewChannelPage(req, res) {
     if (req.isAuthenticated()) {
-      res.render("new-channel.ejs");
+      res.render("new-channel");
     } else {
       res.redirect("/login");
     }
@@ -54,7 +54,7 @@ class ChannelController {
         await Channel.create(req.body.name, req.user.userId);
         res.redirect("/");
       } catch (err) {
-        res.render("new-channel.ejs", {
+        res.render("new-channel", {
           name: req.body.name,
           errorMessage: "Това име на канал вече съществува!",
         });
@@ -71,19 +71,19 @@ class ChannelController {
         const isMember = await channel.isUserMember(req.user.userId);
 
         if (!(isMember || req.user.userType === "Администратор")) {
-          return res.status(403).render("error-message.ejs", {
+          return res.status(403).render("error-message", {
             errorMessage: "Не си член на този канал.",
           });
         }
 
         const posts = await Post.getFromChannel(channel.channelId);
 
-        res.render("view-posts.ejs", {
+        res.render("view-posts", {
           posts,
           channel,
         });
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Грешка при зареждане на постовете.",
         });
       }
@@ -99,9 +99,9 @@ class ChannelController {
           req.body.searchedItem,
           req.user.userId
         );
-        res.render("search-channel-result.ejs", { channels });
+        res.render("search-channel-result", { channels });
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Грешка при търсене на канал.",
         });
       }
@@ -117,7 +117,7 @@ class ChannelController {
         await channel.addMember(req.user.userId);
         res.redirect(`/view/${channel.channelId}`);
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Не може да се присъединиш към канала.",
         });
       }
@@ -133,7 +133,7 @@ class ChannelController {
         await channel.removeMember(req.user.userId);
         res.redirect("/");
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Не можеш да излезеш от канала.",
         });
       }
@@ -151,12 +151,12 @@ class ChannelController {
           req.user.userId === channel.adminId ||
           req.user.userType === "Администратор"
         ) {
-          res.render("edit-channel.ejs", { channel });
+          res.render("edit-channel", { channel });
         } else {
           res.redirect("/");
         }
       } catch (err) {
-        res.status(404).render("error-message.ejs", {
+        res.status(404).render("error-message", {
           errorMessage: "Каналът не е намерен.",
         });
       }
@@ -178,7 +178,7 @@ class ChannelController {
         }
         res.redirect("/");
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Неуспешно актуализиране на канала.",
         });
       }
@@ -196,12 +196,12 @@ class ChannelController {
           req.user.userId === channel.adminId ||
           req.user.userType === "Администратор"
         ) {
-          res.render("delete-channel.ejs", { channel });
+          res.render("delete-channel", { channel });
         } else {
           res.redirect("/");
         }
       } catch (err) {
-        res.status(404).render("error-message.ejs", {
+        res.status(404).render("error-message", {
           errorMessage: "Каналът не съществува.",
         });
       }
@@ -223,7 +223,7 @@ class ChannelController {
         }
         res.redirect("/");
       } catch (err) {
-        res.status(500).render("error-message.ejs", {
+        res.status(500).render("error-message", {
           errorMessage: "Неуспешно изтриване на канала.",
         });
       }

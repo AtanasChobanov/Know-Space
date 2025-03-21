@@ -4,6 +4,7 @@ import methodOverride from "method-override";
 import session from "express-session";
 import flash from "connect-flash";
 import env from "dotenv";
+import path from "path";
 import channelRoutes from "./routes/channelRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
@@ -33,6 +34,8 @@ app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride("_method"));
+app.set("view engine", "ejs");
+app.set("views", path.join(path.resolve(), "views"));
 
 // Middlewares for global data
 app.use((req, res, next) => {

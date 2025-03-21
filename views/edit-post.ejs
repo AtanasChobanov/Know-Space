@@ -1,4 +1,4 @@
-<%- include("partials/header.ejs") %>
+<%- include("partials/header") %>
 
     <h1>Редактиране на пост</h1>
     <form action="/<%= channelId %>/edit-post/<%= post.postId %>?_method=PATCH" method="POST" id="post-form" enctype="multipart/form-data">
@@ -109,4 +109,4 @@
 
     <script src="/scripts/new-post.js"></script>
 
-<%- include("partials/footer.ejs") %>
+<%- include("partials/footer") %>
