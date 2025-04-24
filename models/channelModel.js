@@ -1,7 +1,8 @@
 import db from "../config/db.js";
+import File from "./fileModel.js";
 
 class Channel {
-  constructor(channelId, name, dateOfCreation, adminId, admin = null, adminPicture = null, membersCount = 0) {
+  constructor(channelId, name, dateOfCreation, adminId, admin = null, adminPicture = null, membersCount = 0, bannerUrl = null) {
     this.channelId = channelId;
     this.name = name;
     this.dateOfCreation = new Date(dateOfCreation).toDateString();
@@ -9,6 +10,7 @@ class Channel {
     this.admin = admin;
     this.adminPicture = adminPicture;
     this.membersCount = membersCount;
+    this.bannerUrl = bannerUrl;
   }
 
   async addMember(userId) {
@@ -51,10 +53,20 @@ class Channel {
     }
   }
 
-  async update(newName) {
+  async update(newName, banner) {
     try {
-      await db.query("UPDATE channels SET name = $1 WHERE channel_id = $2;", [
+      if (banner.url !== '') {
+        if (this.bannerUrl) {
+          const oldBanner = new File(null, null, this.bannerUrl, "image", null);
+          await oldBanner.deleteFromCloudinary();
+        }
+      } else {
+        banner.url = this.bannerUrl; // keep the old banner if no new one is provided
+      }
+
+      await db.query("UPDATE channels SET name = $1, banner_url = $2 WHERE channel_id = $3;", [
         newName,
+        banner.url,
         this.channelId,
       ]);
       console.log(`Updated channel with id: ${this.channelId}.`);
@@ -66,6 +78,10 @@ class Channel {
 
   async delete() {
     try {
+      if (this.bannerUrl) {
+        const bannerFile = new File(null, null, this.bannerUrl, "image", null);
+        await bannerFile.deleteFromCloudinary();
+      }
       await db.query("DELETE FROM channels WHERE channel_id = $1;", [this.channelId]);
       console.log(`Deleted channel with id: ${this.channelId}.`);
     } catch (err) {
@@ -78,7 +94,8 @@ class Channel {
   static async getUserChannels(userId) {
     try {
       const query = `
-          SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
+          SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, 
+          u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count, ch.banner_url
           FROM channels ch
           JOIN users u ON ch.admin_id = u.user_id
           LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
@@ -97,7 +114,8 @@ class Channel {
         channel.admin_id,
         channel.admin,
         channel.admin_picture,
-        channel.members_count
+        channel.members_count,
+        channel.banner_url,
       ));
     } catch (err) {
       console.error("Error fetching user channels:", err);
@@ -109,7 +127,8 @@ class Channel {
   static async getRecentChannels(userId, limit = 15) {
     try {
       const query = `
-          SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count
+          SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, u.username AS admin, 
+          u.profile_picture AS admin_picture, COUNT(moc.user_id) AS members_count, ch.banner_url
           FROM channels ch
           JOIN users u ON ch.admin_id = u.user_id
           LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
@@ -128,6 +147,7 @@ class Channel {
           channel.admin,
           channel.admin_picture,
           channel.members_count,
+          channel.banner_url,
         );
         c.isUserMember = await c.isUserMember(userId);
         return c;
@@ -140,13 +160,13 @@ class Channel {
   }
 
   // CREATE new channel in DB
-  static async create(name, adminId) {
+  static async create(name, banner, adminId) {
     try {
       const result = await db.query(
-        `INSERT INTO channels (name, admin_id) 
-          VALUES ($1, $2) 
+        `INSERT INTO channels (name, admin_id, banner_url) 
+          VALUES ($1, $2, $3) 
           RETURNING *;`,
-        [name, adminId]
+        [name, adminId, banner.url]
       );
 
       const newChannel = new Channel(
@@ -154,6 +174,10 @@ class Channel {
         result.rows[0].name,
         result.rows[0].date_of_creation,
         result.rows[0].admin_id,
+        null,
+        null,
+        0,
+        result.rows[0].banner_url,
       );
 
       await newChannel.addMember(adminId);
@@ -177,6 +201,10 @@ class Channel {
         channel.name,
         channel.date_of_creation,
         channel.admin_id,
+        null,
+        null,
+        0,
+        channel.banner_url,
       );
     } catch (err) {
       console.error("Error fetching channel:", err);
@@ -190,7 +218,7 @@ class Channel {
       const result = await db.query(
         `SELECT ch.channel_id, ch.name, ch.date_of_creation, ch.admin_id, 
           u.profile_picture AS admin_picture, u.username AS admin,
-          COUNT(moc.user_id) AS members_count
+          COUNT(moc.user_id) AS members_count, ch.banner_url
         FROM channels ch
         JOIN users u ON ch.admin_id = u.user_id
         LEFT JOIN members_of_channels moc ON ch.channel_id = moc.channel_id
@@ -208,6 +236,7 @@ class Channel {
           channel.admin,
           channel.admin_picture,
           channel.members_count,
+          channel.banner_url,
         );
         c.isUserMember = await c.isUserMember(userId);
         return c;

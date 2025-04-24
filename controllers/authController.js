@@ -9,7 +9,7 @@ class UserController {
     res.render("login");
   }
 
-  static async registerController(req, res) {
+  static async register(req, res) {
     const { username, email, password, type } = req.body;
 
     try {
@@ -72,7 +72,7 @@ class UserController {
     }
   }
 
-  static async updateController(req, res) {
+  static async update(req, res) {
     if (req.isAuthenticated()) {
       try {
         const user = await User.getForeignUserById(req.user.userId);
@@ -108,7 +108,7 @@ class UserController {
     }
   }
 
-  static async changePasswordController(req, res) {
+  static async changePassword(req, res) {
     if (req.isAuthenticated()) {
       const { oldPassword, newPassword, confirmPassword } = req.body;
       try {
@@ -157,7 +157,81 @@ class UserController {
     }
   }
 
-  static logoutController(req, res) {
+  static async changeProfilePicture(req, res) {
+    if (req.isAuthenticated()) {
+      try {
+        const user = await User.getForeignUserById(req.user.userId);
+        if (req.uploadedFiles) {
+          await user.updateProfilePicture(req.uploadedFiles[0]);
+        }
+
+        req.logout((err) => {
+          if (err) {
+            console.error("Error during logout:", err);
+            return res.status(500).render("error-message", {
+              errorMessage:
+                "Грешка при обновяване на сесията. Моля, опитайте отново.",
+            });
+          }
+
+          req.login(user, (err) => {
+            if (err) {
+              console.error("Error during re-login:", err);
+              return res.status(500).render("error-message", {
+                errorMessage: "Грешка при влизане след смяна на профилната снимка.",
+              });
+            }
+            res.redirect("/account/" + req.user.userId);
+          });
+        });
+      } catch (err) {
+        console.error("Error changing profile picture:", err);
+        res.status(500).render("error-message", {
+          errorMessage: "Грешка при смяна на профилната снимка. Опитайте отново.",
+        });
+      }
+    } else {
+      res.redirect("/login");
+    }
+  }
+
+  static async deleteProfilePicture(req, res) {
+    if (req.isAuthenticated()) {
+      try {
+        const user = await User.getForeignUserById(req.user.userId);
+        await user.deleteProfilePicture();
+
+        req.logout((err) => {
+          if (err) {
+            console.error("Error during logout:", err);
+            return res.status(500).render("error-message", {
+              errorMessage:
+                "Грешка при обновяване на сесията. Моля, опитайте отново.",
+            });
+          }
+
+          req.login(user, (err) => {
+            if (err) {
+              console.error("Error during re-login:", err);
+              return res.status(500).render("error-message", {
+                errorMessage: "Грешка при влизане след смяна на профилната снимка.",
+              });
+            }
+            res.redirect("/account/" + req.user.userId);
+          });
+        });
+      } catch (err) {
+        console.error("Error deleting profile picture:", err);
+        res.status(500).render("error-message", {
+          errorMessage: "Грешка при изтриване на профилната снимка. Опитайте отново.",
+        });
+      }
+    } else {
+      res.redirect("/login");
+    }
+  }
+
+  static logout(req, res) {
     req.logout(function (err) {
       if (err) {
         return next(err);

@@ -1,6 +1,9 @@
 import db from "../config/db.js";
 import bcrypt from "bcrypt";
 import Post from "./postModel.js";
+import cloudinary  from "../config/cloudinary.js";
+import fs from "fs/promises";
+import File from "./fileModel.js";
 
 const saltRounds = 10;
 const defaultAvatars = [
@@ -11,16 +14,6 @@ const defaultAvatars = [
 ];
 
 class User {
-  static async getTotalUsers() {
-    try {
-      const result = await db.query('SELECT COUNT(*) as count FROM users');
-      return parseInt(result.rows[0].count);
-    } catch (err) {
-      console.error('Error counting users:', err);
-      throw err;
-    }
-  }
-
   constructor(
     userId,
     email,
@@ -113,6 +106,55 @@ class User {
     return await this.#verifyPassword(inputPassword);
   }
 
+  async updateProfilePicture(avatar) {
+    try {
+      await this.deleteProfilePicture();
+      await db.query(
+        "UPDATE users SET profile_picture = $1 WHERE user_id = $2",
+        [avatar.url, this.userId]
+      );
+    } catch (err) {
+      console.error("Error updating profile picture:", err);
+      throw err;
+    }
+  }
+
+  async deleteProfilePicture() {
+    try {
+      if (this.#isCustomAvatar()) {
+        const avatarFile = new File(null, null, this.profilePicture, "image", null);
+        await avatarFile.deleteFromCloudinary();
+
+        const newAvatar = User.#randomDefaultAvatar();
+        await db.query(
+          "UPDATE users SET profile_picture = $1 WHERE user_id = $2",
+          [newAvatar, this.userId]
+        );
+      }
+    } catch (err) {
+      console.error("Error deleting profile picture:", err);
+      throw err;
+    }
+  }
+
+  #isCustomAvatar() {
+    return this.profilePicture.includes("res.cloudinary.com"); // Returns true if there is cloudinary in the URL
+  }
+
+  static #randomDefaultAvatar() {
+    return "/uploads/profile-pictures/" + defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
+  }
+
+  static async getTotalUsers() {
+    try {
+      const result = await db.query('SELECT COUNT(*) as count FROM users');
+      return parseInt(result.rows[0].count);
+    } catch (err) {
+      console.error('Error counting users:', err);
+      throw err;
+    }
+  }
+
   static async #getById(userId) {
     const result = await db.query("SELECT * FROM users WHERE user_id = $1;", [
       userId,
@@ -134,11 +176,7 @@ class User {
 
   static async create(email, username, password, userType, avatar) {
     try {
-      if (!avatar) {
-        avatar =
-          "/uploads/profile-pictures/" +
-          defaultAvatars[Math.floor(Math.random() * defaultAvatars.length)];
-      }
+      avatar = !avatar ? User.#randomDefaultAvatar() : avatar;
 
       if (password !== "google") {
         password = await bcrypt.hash(password, saltRounds);

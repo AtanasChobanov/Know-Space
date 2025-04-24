@@ -49,14 +49,13 @@ class Post extends PostFilesManager {
         [sanitizedTitle, sanitizedContent, this.postId]
       );
 
-      // Изтриване на избраните файлове
+      // Delete selected files
       if (deletedFiles && deletedFiles.length > 0) {
         await this.deleteFiles(deletedFiles);
       }
-
-      // Качване на нови файлове
+      // Add new files
       if (newFiles && newFiles.length > 0) {
-        await this.uploadFilesToCloudinary(newFiles);
+        await this.addFiles(newFiles);
       }
     } catch (err) {
       console.error("Error updating post:", err);
@@ -67,7 +66,7 @@ class Post extends PostFilesManager {
   // DELETE a post
   async delete() {
     try {
-      this.deleteAllFiles();
+      await this.deleteAllFiles();
       await db.query(
         `DELETE FROM posts 
          WHERE post_id = $1;`,
@@ -195,7 +194,9 @@ class Post extends PostFilesManager {
         post.date_of_creation,
         post.date_of_last_edit
       );
-      await post.uploadFilesToCloudinary(files);
+      if (files && files.length > 0) {
+        await post.addFiles(files);
+      }
       console.log(`New post created with ID: ${post.postId}`);
     } catch (err) {
       console.error("Error creating post:", err);
@@ -219,7 +220,6 @@ class Post extends PostFilesManager {
   static async searchWikipedia(searchedItem) {
     try {
       const response = await fetchWikipediaArticles(searchedItem);
-      // Използваме Promise.all(), за да изчакаме всички асинхронни заявки
       const posts = await Promise.all(response.map(async (item) => {
           const post = new Post(
             item.postId,

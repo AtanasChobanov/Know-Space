@@ -1,5 +1,3 @@
-import cloudinary  from "../config/cloudinary.js";
-import fs from "fs/promises";
 import File from "./fileModel.js";
 import db from "../config/db.js";
 import { fetchWikipediaImages } from "../config/wikipedia.js";
@@ -10,29 +8,9 @@ class PostFilesManager {
     this.uploadedFiles = [];
   }
 
-  async uploadFilesToCloudinary(files) {
+  async addFiles(files) {
     try {
-      for (const file of files) {
-        let result;
-
-        if (file.fieldname === "images") {
-          result = await cloudinary.uploader.upload(file.path, {
-            folder: "uploads/images",
-          });
-          this.uploadedFiles.push(
-            await File.addFile(this.postId, result.secure_url, "image")
-          );
-        } else if (file.fieldname === "documents") {
-          result = await cloudinary.uploader.upload(file.path, {
-            folder: "uploads/documents",
-            resource_type: "raw",
-          });
-          this.uploadedFiles.push(
-            await File.addFile(this.postId, result.secure_url, "document")
-          );
-        }
-        await fs.unlink(file.path); // Delete local files after upload
-      }
+      await Promise.all(files.map((file) => File.addFile(this.postId, file.url, file.type)));
     } catch (err) {
       console.error("Error uploading files to Cloudinary:", err);
       throw err;
@@ -51,10 +29,9 @@ class PostFilesManager {
       const filesToDelete = this.uploadedFiles.filter(file => 
         fileIds.includes(file.fileId)
       );
-
-      for (const file of filesToDelete) {
-        await file.deleteFromCloudinary();
-      }
+      await Promise.all(
+        filesToDelete.map((file) => file.deleteFromCloudinary())
+      );
 
       await db.query(`DELETE FROM post_files WHERE file_id = ANY($1::int[])`, [
         fileIds,
@@ -69,9 +46,7 @@ class PostFilesManager {
   async deleteAllFiles() {
     try {
       await this.getFiles();
-      for (const file of this.uploadedFiles) {
-        await file.deleteFromCloudinary();
-      }
+      await Promise.all(this.uploadedFiles.map((file) => file.deleteFromCloudinary()));
     } catch (err) {
       console.error("Error deleting files from Cloudinary:", err);
       throw err;

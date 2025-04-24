@@ -1,6 +1,7 @@
 import express from "express";
 import UserController from "../controllers/authController.js";
 import passport from "passport";
+import { uploadFiles } from "../config/multer.js";
 
 const router = express.Router();
 
@@ -25,14 +26,18 @@ router.get(
 );
 
 router.get("/register", UserController.getRegisterPage);
-router.post("/register", UserController.registerController);
+router.post("/register", UserController.register);
 
 router.get("/account/:userId", UserController.getAccountPage);
 
 router.get("/edit-profile", UserController.getEditProfilePage);
-router.post("/edit-profile", UserController.updateController);
-router.post("/change-password", UserController.changePasswordController);
+router.post("/edit-profile", UserController.update);
 
-router.get("/logout", UserController.logoutController);
+router.post("/change-password", UserController.changePassword);
+
+router.patch("/change-profile-picture", uploadFiles, UserController.changeProfilePicture);
+router.delete("/delete-profile-picture", UserController.deleteProfilePicture);
+
+router.get("/logout", UserController.logout);
 
 export default router;

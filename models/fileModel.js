@@ -20,15 +20,10 @@ class File {
     return `${folderPath}/${fileName}`;
   }
 
-  #extractResourseType() {
-    const urlParts = this.url.split("/");
-    return urlParts[urlParts.indexOf("upload") - 1];
-  }
-
   // Функция за изтриване на файл
   async deleteFromCloudinary() {
     try {
-      const result = await cloudinary.uploader.destroy(this.#extractPublicId(), { resource_type: this.#extractResourseType() });
+      const result = await cloudinary.uploader.destroy(this.#extractPublicId(), { resource_type: this.type === "document" ? "raw" : "image" });
       console.log("File deleted from Cloudinary:", result);
       return result;
     } catch (err) {

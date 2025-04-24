@@ -4,7 +4,7 @@ import Vote from "../models/voteModel.js";
 import User from "../models/userModel.js";
 
 class PostController {
-  static async getFeedController(req, res) {
+  static async getFeed(req, res) {
     if (req.isAuthenticated()) {
       try {
         const posts = await Post.getFromUserChannels(req.user.userId);
@@ -49,28 +49,15 @@ class PostController {
     }
   }
 
-  static async createController(req, res) {
+  static async create(req, res) {
     if (req.isAuthenticated()) {
       try {
-        if (req.files.images && req.files.images.length > 5) {
-          return res.status(400).render("new-post", {
-            errorMessage: "Не може да се качват повече от 5 снимки.",
-            title: req.body.title,
-            content: req.body.content,
-            channelId: req.params.channelId,
-          });
-        }
-
-        const files = [
-          ...(req.files.images || []),
-          ...(req.files.documents || []),
-        ];
         await Post.create(
           req.body.title,
           req.body.content,
           req.user.userId,
           req.params.channelId,
-          files
+          req.uploadedFiles,
         );
 
         res.redirect(`/view/${req.params.channelId}`);
@@ -85,7 +72,7 @@ class PostController {
     }
   }
 
-  static async voteController(req, res) {
+  static async vote(req, res) {
     try {
       const voteType = req.body.voteType;
       if (!Vote.VALID_VOTE_TYPES.includes(voteType)) {
@@ -99,7 +86,7 @@ class PostController {
     }
   }
 
-  static async getPostVotesController(req, res) {
+  static async getPostVotes(req, res) {
     try {
       const post = await Post.getById(req.params.postId);
       const votes = await post.getVotes(req.user.userId);
@@ -109,7 +96,7 @@ class PostController {
     }
   }
 
-  static async showSearchedPostsController(req, res) {
+  static async showSearchedPosts(req, res) {
     if (req.isAuthenticated()) {
       try {
         let posts = await Post.search(
@@ -160,7 +147,7 @@ class PostController {
     }
   }
 
-  static async updateController(req, res) {
+  static async update(req, res) {
     if (req.isAuthenticated()) {
       try {
         const post = await Post.getById(req.params.postId);
@@ -168,15 +155,11 @@ class PostController {
           req.user.userId === post.authorId ||
           req.user.userType === "Администратор"
         ) {
-          const newFiles = [
-            ...(req.files.images || []),
-            ...(req.files.documents || []),
-          ];
           await post.update(
             req.body.title,
             req.body.content,
             req.body.deletedFiles,
-            newFiles
+            req.uploadedFiles,
           );
           res.redirect(`/view/${req.params.channelId}`);
         } else {
@@ -218,7 +201,7 @@ class PostController {
     }
   }
 
-  static async deleteController(req, res) {
+  static async delete(req, res) {
     if (req.isAuthenticated()) {
       try {
         const post = await Post.getById(req.params.postId);

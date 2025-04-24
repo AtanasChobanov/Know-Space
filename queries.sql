@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users
     password text NOT NULL,
     user_type character varying(6) NOT NULL,
     bio character varying(200),
-    profile_picture character varying(200)
+    profile_picture character varying(200),
+    date_of_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS channels
@@ -15,6 +16,7 @@ CREATE TABLE IF NOT EXISTS channels
     name VARCHAR(50) NOT NULL UNIQUE,
     admin_id integer NOT NULL,
     date_of_creation date DEFAULT CURRENT_DATE,
+    banner_url TEXT,
     CONSTRAINT fk_channels_users FOREIGN KEY (admin_id)
         REFERENCES users (user_id) MATCH SIMPLE
         ON UPDATE CASCADE
